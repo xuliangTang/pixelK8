@@ -1,9 +1,11 @@
 package configurations
 
 import (
+	"fmt"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"log"
+	"pixelk8/src/properties"
 )
 
 // K8sCfg @configuration
@@ -16,7 +18,7 @@ func NewK8sCfg() *K8sCfg {
 // InitClient 初始化 k8s client
 func (*K8sCfg) InitClient() *kubernetes.Clientset {
 	config := &rest.Config{
-		Host:        "110.41.142.160:8009",
+		Host:        fmt.Sprintf("%s:%d", properties.App.K8s.Host, properties.App.K8s.Port),
 		BearerToken: "",
 	}
 	client, err := kubernetes.NewForConfig(config)
