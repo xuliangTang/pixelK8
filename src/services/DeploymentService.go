@@ -4,7 +4,7 @@ import (
 	"github.com/xuliangTang/athena/athena"
 	appsV1 "k8s.io/api/apps/v1"
 	"pixelk8/src/core/maps"
-	"pixelk8/src/models"
+	"pixelk8/src/dto"
 )
 
 // DeploymentService @service
@@ -18,11 +18,11 @@ func NewDeploymentService() *DeploymentService {
 }
 
 // ListByNs 获取deployment列表
-func (this *DeploymentService) ListByNs(namespace string) (ret []*models.DeploymentModel) {
+func (this *DeploymentService) ListByNs(namespace string) (ret []*dto.DeploymentList) {
 	depList := athena.Unwrap(this.DeploymentMap.ListByNs(namespace)).([]*appsV1.Deployment)
 
 	for _, dep := range depList {
-		ret = append(ret, &models.DeploymentModel{
+		ret = append(ret, &dto.DeploymentList{
 			Name:        dep.Name,
 			NameSpace:   dep.Namespace,
 			Replicas:    [3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas},

@@ -26,7 +26,7 @@ func (this *DeploymentMap) ListByNs(namespace string) ([]*appsV1.Deployment, err
 		return depList.([]*appsV1.Deployment), nil
 	}
 
-	return nil, fmt.Errorf("record not found")
+	return []*appsV1.Deployment{}, nil
 }
 
 // Find 根据名称查找
@@ -39,7 +39,7 @@ func (this *DeploymentMap) Find(ns string, depName string) (*appsV1.Deployment, 
 		}
 	}
 
-	return nil, fmt.Errorf("record not found")
+	return &appsV1.Deployment{}, nil
 }
 
 // Update 更新

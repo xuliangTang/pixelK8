@@ -12,3 +12,15 @@ func NewK8sMapCfg() *K8sMapCfg {
 func (*K8sMapCfg) InitDeploymentMap() *maps.DeploymentMap {
 	return &maps.DeploymentMap{}
 }
+
+func (*K8sMapCfg) InitReplicaSetMap() *maps.ReplicaSetMap {
+	return &maps.ReplicaSetMap{}
+}
+
+func (*K8sMapCfg) InitPodMap() *maps.PodMap {
+	return &maps.PodMap{}
+}
+
+func (*K8sMapCfg) InitEventMap() *maps.EventMap {
+	return &maps.EventMap{}
+}

@@ -16,3 +16,7 @@ func (*ServiceCfg) InitCommonService() *services.CommonService {
 func (*ServiceCfg) InitDeploymentService() *services.DeploymentService {
 	return services.NewDeploymentService()
 }
+
+func (*ServiceCfg) InitPodService() *services.PodService {
+	return services.NewPodService()
+}
