@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.8.1
+	github.com/gorilla/websocket v1.5.0
 	github.com/spf13/viper v1.13.0
 	github.com/xuliangTang/athena v1.0.2
 	k8s.io/api v0.26.0
