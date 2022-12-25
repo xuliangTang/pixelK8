@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	athena.Ignite().
+	server := athena.Ignite().
 		MappingConfig(&properties.App).
 		Configuration(
 			configurations.NewK8sMapCfg(),
@@ -16,6 +16,13 @@ func main() {
 			configurations.NewK8sInformerHandlerCfg(),
 			configurations.NewK8sInformerStart(),
 			configurations.NewServiceCfg()).
-		Mount("v1", nil, controllers.NewDeploymentCtl()).
-		Launch()
+		Mount("v1", nil,
+			controllers.NewDeploymentCtl(),
+			controllers.NewWsCtl())
+
+	/*server.GET("/c/*filepath", func(context *gin.Context) {
+		http.FileServer(FS(false)).ServeHTTP(context.Writer, context.Request)
+	})*/
+
+	server.Launch()
 }

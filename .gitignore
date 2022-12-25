@@ -1,3 +1,7 @@
 .idea
 storage/logs
 application.yml
+
+/c
+static.go
+run.bat

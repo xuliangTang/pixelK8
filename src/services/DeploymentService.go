@@ -24,7 +24,7 @@ func (this *DeploymentService) ListByNs(namespace string) (ret []*dto.Deployment
 	for _, dep := range depList {
 		ret = append(ret, &dto.DeploymentList{
 			Name:        dep.Name,
-			NameSpace:   dep.Namespace,
+			Namespace:   dep.Namespace,
 			Replicas:    [3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas},
 			Images:      this.CommonService.GetImageShortName(dep.Spec.Template.Spec.Containers),
 			IsCompleted: this.checkDeploymentIsCompleted(dep),
