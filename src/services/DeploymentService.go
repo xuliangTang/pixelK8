@@ -29,6 +29,7 @@ func (this *DeploymentService) ListByNs(namespace string) (ret []*dto.Deployment
 			Images:      this.CommonService.GetImageShortName(dep.Spec.Template.Spec.Containers),
 			IsCompleted: this.checkDeploymentIsCompleted(dep),
 			Message:     this.getDeploymentConditionsMessage(dep),
+			CreatedAt:   dep.CreationTimestamp.Format("2006-01-02 15:04:05"),
 		})
 	}
 

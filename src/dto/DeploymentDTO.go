@@ -7,4 +7,5 @@ type DeploymentList struct {
 	Images      string   `json:"images"`
 	IsCompleted bool     `json:"is_completed"`
 	Message     string   `json:"message"`
+	CreatedAt   string   `json:"created_at"`
 }
