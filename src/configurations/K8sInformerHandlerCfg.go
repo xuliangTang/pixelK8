@@ -23,6 +23,10 @@ func (*K8sInformerHandlerCfg) InitPodHandler() *informerHandlers.PodHandler {
 	return &informerHandlers.PodHandler{}
 }
 
-func (*K8sInformerHandlerCfg) EventHandler() *informerHandlers.EventHandler {
+func (*K8sInformerHandlerCfg) InitEventHandler() *informerHandlers.EventHandler {
 	return &informerHandlers.EventHandler{}
+}
+
+func (*K8sInformerHandlerCfg) InitNamespaceHandler() *informerHandlers.NamespaceHandler {
+	return &informerHandlers.NamespaceHandler{}
 }

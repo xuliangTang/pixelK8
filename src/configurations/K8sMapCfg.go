@@ -24,3 +24,7 @@ func (*K8sMapCfg) InitPodMap() *maps.PodMap {
 func (*K8sMapCfg) InitEventMap() *maps.EventMap {
 	return &maps.EventMap{}
 }
+
+func (*K8sMapCfg) InitNamespaceMap() *maps.NamespaceMap {
+	return &maps.NamespaceMap{}
+}

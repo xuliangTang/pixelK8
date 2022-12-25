@@ -20,3 +20,7 @@ func (*ServiceCfg) InitDeploymentService() *services.DeploymentService {
 func (*ServiceCfg) InitPodService() *services.PodService {
 	return services.NewPodService()
 }
+
+func (*ServiceCfg) InitNamespaceService() *services.NamespaceService {
+	return services.NewNamespaceService()
+}
