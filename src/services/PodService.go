@@ -32,23 +32,15 @@ func (this *PodService) ListByDeployment(ns, depName string) []*dto.PodList {
 // ListByLabels 通过labels获取pods列表
 func (this *PodService) ListByLabels(ns string, labels []map[string]string) (ret []*dto.PodList) {
 	podList := athena.Unwrap(this.PodMap.ListByLabels(ns, labels)).([]*coreV1.Pod)
-	ret = make([]*dto.PodList, len(podList))
 
-	for i, pod := range podList {
-		ret[i] = &dto.PodList{
-			Name:      pod.Name,
-			NameSpace: pod.Namespace,
-			NodeName:  pod.Spec.NodeName,
-			Images:    this.CommonService.GetImageShortName(pod.Spec.Containers),
-			Ip:        [2]string{pod.Status.PodIP, pod.Status.HostIP},
-			Phase:     string(pod.Status.Phase),
-			IsReady:   this.CheckPodReady(pod),
-			Message:   this.EventMap.GetMessage(pod.Namespace, "Pod", pod.Name),
-			CreatedAt: pod.CreationTimestamp.Format("2006-01-02 15:04:05"),
-		}
-	}
+	return this.convertPodList(podList)
+}
 
-	return
+// ListByNs 通过ns获取pod列表
+func (this *PodService) ListByNs(ns string) (ret []*dto.PodList) {
+	podList := this.PodMap.ListByNs(ns)
+
+	return this.convertPodList(podList)
 }
 
 // CheckPodReady 评估Pod是否就绪
@@ -70,4 +62,24 @@ func (*PodService) CheckPodReady(pod *coreV1.Pod) bool {
 	}
 
 	return true
+}
+
+// 将原生pods列表转换为dto对象
+func (this *PodService) convertPodList(podList []*coreV1.Pod) (ret []*dto.PodList) {
+	ret = make([]*dto.PodList, len(podList))
+	for i, pod := range podList {
+		ret[i] = &dto.PodList{
+			Name:      pod.Name,
+			NameSpace: pod.Namespace,
+			NodeName:  pod.Spec.NodeName,
+			Images:    this.CommonService.GetImageShortName(pod.Spec.Containers),
+			Ip:        [2]string{pod.Status.PodIP, pod.Status.HostIP},
+			Phase:     string(pod.Status.Phase),
+			IsReady:   this.CheckPodReady(pod),
+			Message:   this.EventMap.GetMessage(pod.Namespace, "Pod", pod.Name),
+			CreatedAt: pod.CreationTimestamp.Format("2006-01-02 15:04:05"),
+		}
+	}
+
+	return
 }

@@ -71,6 +71,14 @@ func (this *PodMap) ListByLabels(ns string, labels []map[string]string) ([]*core
 	return []*coreV1.Pod{}, nil
 }
 
+// ListByNs 根据ns获取pod列表
+func (this *PodMap) ListByNs(ns string) []*coreV1.Pod {
+	if podList, ok := this.Data.Load(ns); ok {
+		return podList.([]*coreV1.Pod)
+	}
+	return []*coreV1.Pod{}
+}
+
 // Find 查找 Pod
 func (this *PodMap) Find(ns string, name string) *coreV1.Pod {
 	if podList, ok := this.Data.Load(ns); ok {

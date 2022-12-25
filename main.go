@@ -19,7 +19,8 @@ func main() {
 		Mount("v1", nil,
 			controllers.NewDeploymentCtl(),
 			controllers.NewWsCtl(),
-			controllers.NewNamespaceCtl())
+			controllers.NewNamespaceCtl(),
+			controllers.NewPodCtl())
 
 	/*server.GET("/c/*filepath", func(context *gin.Context) {
 		http.FileServer(FS(false)).ServeHTTP(context.Writer, context.Request)
