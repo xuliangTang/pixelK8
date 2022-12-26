@@ -2,6 +2,7 @@ package maps
 
 import (
 	coreV1 "k8s.io/api/core/v1"
+	"sort"
 	"sync"
 )
 
@@ -29,11 +30,17 @@ func (this *NamespaceMap) Find(ns string) *coreV1.Namespace {
 }
 
 func (this *NamespaceMap) List() []*coreV1.Namespace {
-	ret := make([]*coreV1.Namespace, 0)
-	this.data.Range(func(key, value any) bool {
+	nsList := convertToMapItems(&this.data)
+	sort.Sort(nsList)
+	ret := make([]*coreV1.Namespace, len(nsList))
+	for i, ns := range nsList {
+		ret[i] = ns.Value.(*coreV1.Namespace)
+	}
+
+	/*this.data.Range(func(key, value any) bool {
 		ret = append(ret, value.(*coreV1.Namespace))
 		return true
-	})
+	})*/
 
 	return ret
 }
