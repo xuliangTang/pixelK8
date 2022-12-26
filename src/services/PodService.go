@@ -45,9 +45,13 @@ func (this *PodService) ListByNs(ns string) (ret []*dto.PodList) {
 
 // CheckPodReady 评估Pod是否就绪
 func (*PodService) CheckPodReady(pod *coreV1.Pod) bool {
+	if pod.Status.Phase != "Running" {
+		return false
+	}
+
 	// 所有容器是否就绪
 	for _, condition := range pod.Status.Conditions {
-		if condition.Type == "ContainersReady" && condition.Status != "True" {
+		if condition.Status != "True" {
 			return false
 		}
 	}
