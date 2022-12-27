@@ -4,6 +4,7 @@ import (
 	"fmt"
 	coreV1 "k8s.io/api/core/v1"
 	"reflect"
+	"sort"
 	"sync"
 )
 
@@ -65,6 +66,7 @@ func (this *PodMap) ListByLabels(ns string, labels []map[string]string) ([]*core
 			}
 		}
 
+		sort.Sort(coreV1Pods(ret))
 		return ret, nil
 	}
 
@@ -74,7 +76,10 @@ func (this *PodMap) ListByLabels(ns string, labels []map[string]string) ([]*core
 // ListByNs 根据ns获取pod列表
 func (this *PodMap) ListByNs(ns string) []*coreV1.Pod {
 	if podList, ok := this.Data.Load(ns); ok {
-		return podList.([]*coreV1.Pod)
+		ret := podList.([]*coreV1.Pod)
+		sort.Sort(coreV1Pods(ret))
+
+		return ret
 	}
 	return []*coreV1.Pod{}
 }

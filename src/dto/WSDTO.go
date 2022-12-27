@@ -5,6 +5,6 @@ import (
 )
 
 type WS struct {
-	Type   string
-	Result gin.H
+	Type   string `json:"type"`
+	Result gin.H  `json:"result"`
 }

@@ -3,6 +3,7 @@ package maps
 import (
 	"fmt"
 	appsV1 "k8s.io/api/apps/v1"
+	"sort"
 	"sync"
 )
 
@@ -23,7 +24,10 @@ func (this *DeploymentMap) Add(deployment *appsV1.Deployment) {
 // ListByNs 获取列表
 func (this *DeploymentMap) ListByNs(namespace string) ([]*appsV1.Deployment, error) {
 	if depList, ok := this.data.Load(namespace); ok {
-		return depList.([]*appsV1.Deployment), nil
+		ret := depList.([]*appsV1.Deployment)
+		sort.Sort(appsV1Deployments(ret))
+
+		return ret, nil
 	}
 
 	return []*appsV1.Deployment{}, nil
