@@ -21,23 +21,7 @@ func (this *PodCtl) pods(ctx *gin.Context) athena.Collection {
 	ns := ctx.DefaultQuery("ns", properties.App.K8s.DefaultNs)
 	podList := this.PodService.ListByNs(ns)
 
-	// pod总数和就绪数
-	var count, countReady int
-	iPodList := make([]any, len(podList))
-	for i, pod := range podList {
-		iPodList[i] = pod
-		count++
-		if pod.IsReady {
-			countReady++
-		}
-	}
-
-	page.Extend = gin.H{"count": count, "count_ready": countReady}
-	// 分页
-	start, end := page.SlicePage(iPodList)
-	collection := athena.NewCollection(podList[start:end], page)
-
-	return *collection
+	return this.PodService.Paging(page, podList)
 }
 
 func (this *PodCtl) Build(athena *athena.Athena) {

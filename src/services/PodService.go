@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	appsV1 "k8s.io/api/apps/v1"
 	coreV1 "k8s.io/api/core/v1"
@@ -41,6 +42,25 @@ func (this *PodService) ListByNs(ns string) (ret []*dto.PodList) {
 	podList := this.PodMap.ListByNs(ns)
 
 	return this.convertPodList(podList)
+}
+
+// Paging 将pods切片数据分页
+func (this *PodService) Paging(page *athena.Page, podList []*dto.PodList) athena.Collection {
+	var count, countReady int // pod总数和就绪数
+	iPodList := make([]any, len(podList))
+	for i, pod := range podList {
+		iPodList[i] = pod
+		count++
+		if pod.IsReady {
+			countReady++
+		}
+	}
+
+	page.Extend = gin.H{"count": count, "count_ready": countReady}
+	// 分页
+	start, end := page.SlicePage(iPodList)
+	collection := athena.NewCollection(podList[start:end], page)
+	return *collection
 }
 
 // CheckPodReady 评估Pod是否就绪
