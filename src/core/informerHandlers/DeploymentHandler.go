@@ -2,6 +2,7 @@ package informerHandlers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/xuliangTang/athena/athena"
 	appsV1 "k8s.io/api/apps/v1"
 	"log"
 	"pixelk8/src/core/maps"
@@ -20,11 +21,13 @@ func (this *DeploymentHandler) OnAdd(obj interface{}) {
 	this.DeploymentMap.Add(dep)
 
 	// 通知ws客户端
+	depList := this.DeploymentSvc.ListByNs(dep.Namespace)
+	page := athena.NewPage(1, 5)
 	ws.ClientMap.SendAll(dto.WS{
 		Type: "deployments",
 		Result: gin.H{
 			"ns":   dep.Namespace,
-			"data": this.DeploymentSvc.ListByNs(dep.Namespace),
+			"data": this.DeploymentSvc.Paging(page, depList),
 		},
 	})
 }
@@ -35,11 +38,13 @@ func (this *DeploymentHandler) OnUpdate(oldObj, newObj interface{}) {
 	if err != nil {
 		log.Println(err)
 	} else {
+		depList := this.DeploymentSvc.ListByNs(dep.Namespace)
+		page := athena.NewPage(1, 5)
 		ws.ClientMap.SendAll(dto.WS{
 			Type: "deployments",
 			Result: gin.H{
 				"ns":   dep.Namespace,
-				"data": this.DeploymentSvc.ListByNs(dep.Namespace),
+				"data": this.DeploymentSvc.Paging(page, depList),
 			},
 		})
 	}
@@ -48,11 +53,14 @@ func (this *DeploymentHandler) OnUpdate(oldObj, newObj interface{}) {
 func (this *DeploymentHandler) OnDelete(obj interface{}) {
 	dep := obj.(*appsV1.Deployment)
 	this.DeploymentMap.Delete(dep)
+
+	depList := this.DeploymentSvc.ListByNs(dep.Namespace)
+	page := athena.NewPage(1, 5)
 	ws.ClientMap.SendAll(dto.WS{
 		Type: "deployments",
 		Result: gin.H{
 			"ns":   dep.Namespace,
-			"data": this.DeploymentSvc.ListByNs(dep.Namespace),
+			"data": this.DeploymentSvc.Paging(page, depList),
 		},
 	})
 }
