@@ -20,10 +20,12 @@ func NewDeploymentCtl() *DeploymentCtl {
 	return &DeploymentCtl{}
 }
 
-func (this *DeploymentCtl) deployments(ctx *gin.Context) any {
+func (this *DeploymentCtl) deployments(ctx *gin.Context) athena.Collection {
+	page := athena.NewPageWithCtx(ctx)
 	ns := ctx.DefaultQuery("ns", properties.App.K8s.DefaultNs)
 	depList := this.DeploymentService.ListByNs(ns)
-	return depList
+
+	return this.DeploymentService.Paging(page, depList)
 }
 
 func (this *DeploymentCtl) deploymentPods(ctx *gin.Context) any {

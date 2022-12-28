@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	appsV1 "k8s.io/api/apps/v1"
 	"pixelk8/src/core/maps"
@@ -34,6 +35,25 @@ func (this *DeploymentService) ListByNs(namespace string) (ret []*dto.Deployment
 	}
 
 	return
+}
+
+// Paging 分页deployments切片
+func (this *DeploymentService) Paging(page *athena.Page, depList []*dto.DeploymentList) athena.Collection {
+	var count, countReady int
+	iDepList := make([]any, len(depList))
+	for i, dep := range depList {
+		iDepList[i] = dep
+		count++
+		if dep.IsCompleted {
+			countReady++
+		}
+	}
+
+	page.Extend = gin.H{"count": count, "count_ready": countReady}
+	// 分页
+	start, end := page.SlicePage(iDepList)
+	collection := athena.NewCollection(depList[start:end], page)
+	return *collection
 }
 
 // 评估deployment是否就绪
