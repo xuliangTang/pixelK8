@@ -34,3 +34,7 @@ func (*K8sInformerHandlerCfg) InitNamespaceHandler() *informerHandlers.Namespace
 func (*K8sInformerHandlerCfg) InitIngressHandler() *informerHandlers.IngressHandler {
 	return &informerHandlers.IngressHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitServiceHandler() *informerHandlers.ServiceHandler {
+	return &informerHandlers.ServiceHandler{}
+}

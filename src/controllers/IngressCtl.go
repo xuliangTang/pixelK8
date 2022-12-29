@@ -3,7 +3,9 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"net/http"
 	"pixelk8/src/properties"
+	"pixelk8/src/requests"
 	"pixelk8/src/services"
 )
 
@@ -24,7 +26,17 @@ func (this *IngressCtl) ingress(ctx *gin.Context) athena.Collection {
 	return this.IngSvc.Paging(page, ingList)
 }
 
+func (this *IngressCtl) createIngress(ctx *gin.Context) (athena.HttpCode, any) {
+	req := &requests.CreateIngress{}
+	athena.Error(ctx.BindJSON(req))
+	athena.Error(this.IngSvc.Create(req))
+
+	return http.StatusCreated, req
+}
+
 func (this *IngressCtl) Build(athena *athena.Athena) {
 	// ingress列表
 	athena.Handle("GET", "/ingress", this.ingress)
+	// 创建ingress
+	athena.Handle("POST", "/ingress", this.createIngress)
 }

@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
-	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/properties"
 	"pixelk8/src/requests"
 	"pixelk8/src/services"
@@ -11,7 +10,6 @@ import (
 
 // DeploymentCtl @controller
 type DeploymentCtl struct {
-	K8sClient         *kubernetes.Clientset       `inject:"-"`
 	DeploymentService *services.DeploymentService `inject:"-"`
 	PodService        *services.PodService        `inject:"-"`
 }

@@ -28,3 +28,7 @@ func (*ServiceCfg) InitNamespaceService() *services.NamespaceService {
 func (*ServiceCfg) InitIngressService() *services.IngressService {
 	return services.NewIngressService()
 }
+
+func (*ServiceCfg) InitServiceService() *services.ServiceService {
+	return services.NewServiceService()
+}

@@ -65,3 +65,18 @@ func (this networkingV1Ingress) Less(i, j int) bool {
 func (this networkingV1Ingress) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
+
+// 排序service 按创建时间
+type coreV1Service []*coreV1.Service
+
+func (this coreV1Service) Len() int {
+	return len(this)
+}
+
+func (this coreV1Service) Less(i, j int) bool {
+	return this[i].CreationTimestamp.Before(&this[j].CreationTimestamp)
+}
+
+func (this coreV1Service) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}

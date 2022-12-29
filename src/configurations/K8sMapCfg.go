@@ -32,3 +32,7 @@ func (*K8sMapCfg) InitNamespaceMap() *maps.NamespaceMap {
 func (*K8sMapCfg) InitIngressMap() *maps.IngressMap {
 	return &maps.IngressMap{}
 }
+
+func (*K8sMapCfg) InitServiceMap() *maps.ServiceMap {
+	return &maps.ServiceMap{}
+}
