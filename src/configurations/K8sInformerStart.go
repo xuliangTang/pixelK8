@@ -15,6 +15,7 @@ type K8sInformerStart struct {
 	PodHandler        *informerHandlers.PodHandler        `inject:"-"`
 	EventHandler      *informerHandlers.EventHandler      `inject:"-"`
 	NamespaceHandler  *informerHandlers.NamespaceHandler  `inject:"-"`
+	IngressHandler    *informerHandlers.IngressHandler    `inject:"-"`
 }
 
 func NewK8sInformerStart() *K8sInformerStart {
@@ -38,7 +39,10 @@ func (this *K8sInformerStart) InitInformer() informers.SharedInformerFactory {
 
 	nsInformer := informerFactory.Core().V1().Namespaces()
 	nsInformer.Informer().AddEventHandler(this.NamespaceHandler)
-	
+
+	ingInformer := informerFactory.Networking().V1().Ingresses()
+	ingInformer.Informer().AddEventHandler(this.IngressHandler)
+
 	informerFactory.Start(wait.NeverStop)
 
 	return informerFactory

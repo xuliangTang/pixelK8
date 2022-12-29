@@ -3,5 +3,6 @@ storage/logs
 application.yml
 
 /c
+test.go
 static.go
 run.bat
