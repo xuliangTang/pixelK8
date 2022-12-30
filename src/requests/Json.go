@@ -2,9 +2,10 @@ package requests
 
 // CreateIngress 创建ingress对象
 type CreateIngress struct {
-	Name      string          `json:"name" binding:"required"`
-	Namespace string          `json:"namespace" binding:"required"`
-	Rules     []*IngressRules `json:"rules" binding:"required"`
+	Name        string          `json:"name" binding:"required"`
+	Namespace   string          `json:"namespace" binding:"required"`
+	Rules       []*IngressRules `json:"rules" binding:"required"`
+	Annotations string          `json:"annotations"`
 }
 
 // IngressRules ingress规则

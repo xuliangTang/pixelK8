@@ -17,6 +17,7 @@ import (
 type IngressService struct {
 	IngressMap *maps.IngressMap      `inject:"-"`
 	K8sClient  *kubernetes.Clientset `inject:"-"`
+	CommonSvc  *CommonService        `inject:"-"`
 }
 
 func NewIngressService() *IngressService {
@@ -99,8 +100,9 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 			APIVersion: "networking.k8s.io/v1",
 		},
 		ObjectMeta: metaV1.ObjectMeta{
-			Name:      req.Name,
-			Namespace: req.Namespace,
+			Name:        req.Name,
+			Namespace:   req.Namespace,
+			Annotations: this.CommonSvc.ParseAnnotations(req.Annotations),
 		},
 		Spec: networkingV1.IngressSpec{
 			IngressClassName: &className,

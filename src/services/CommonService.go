@@ -52,3 +52,22 @@ func (*CommonService) CheckRsOfDeployment(set *appsV1.ReplicaSet, deployment *ap
 
 	return false
 }
+
+// ParseAnnotations 解析标签
+func (*CommonService) ParseAnnotations(annotations string) (ret map[string]string) {
+	replace := []string{"\t", " ", "\n", "\r\n"}
+	for _, r := range replace {
+		annotations = strings.ReplaceAll(annotations, r, "")
+	}
+
+	ret = make(map[string]string)
+	list := strings.Split(annotations, ";")
+	for _, item := range list {
+		annotation := strings.Split(item, ":")
+		if len(annotation) == 2 {
+			ret[annotation[0]] = annotation[1]
+		}
+	}
+
+	return
+}
