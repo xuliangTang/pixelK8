@@ -32,6 +32,8 @@ func (this *IngressService) ListByNs(ns string) (ret []*dto.IngressList) {
 	for i, ing := range ingList {
 		ret[i] = &dto.IngressList{
 			Name:      ing.Name,
+			Namespace: ing.Namespace,
+			Hosts:     this.joinRuleHosts(ing.Spec.Rules),
 			CreatedAt: ing.CreationTimestamp.Format(athena.DateTimeFormat),
 		}
 	}
@@ -114,4 +116,14 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 		Create(context.Background(), ingress, metaV1.CreateOptions{})
 
 	return err
+}
+
+// 拼接ingress host
+func (*IngressService) joinRuleHosts(rules []networkingV1.IngressRule) (ret []string) {
+	ret = make([]string, len(rules))
+	for i, rule := range rules {
+		ret[i] = rule.Host
+	}
+
+	return
 }
