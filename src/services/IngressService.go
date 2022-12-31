@@ -7,6 +7,7 @@ import (
 	networkingV1 "k8s.io/api/networking/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"pixelk8/src/constants"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
 	"pixelk8/src/requests"
@@ -35,6 +36,10 @@ func (this *IngressService) ListByNs(ns string) (ret []*dto.IngressList) {
 			Namespace: ing.Namespace,
 			Hosts:     this.joinRuleHosts(ing.Spec.Rules),
 			CreatedAt: ing.CreationTimestamp.Format(athena.DateTimeFormat),
+			Opt: &dto.IngressOpt{
+				CorsEnable:    this.checkOpt(ing, constants.CorsEnable),
+				RewriteEnable: this.checkOpt(ing, constants.RewriteEnable),
+			},
 		}
 	}
 
@@ -126,4 +131,13 @@ func (*IngressService) joinRuleHosts(rules []networkingV1.IngressRule) (ret []st
 	}
 
 	return
+}
+
+// 判断ingress是否开启opt
+func (*IngressService) checkOpt(ingress *networkingV1.Ingress, opt string) bool {
+	if _, ok := ingress.Annotations[opt]; ok {
+		return true
+	}
+
+	return false
 }
