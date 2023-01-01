@@ -125,9 +125,11 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 
 // 拼接ingress host
 func (*IngressService) joinRuleHosts(rules []networkingV1.IngressRule) (ret []string) {
-	ret = make([]string, len(rules))
-	for i, rule := range rules {
-		ret[i] = rule.Host
+	ret = make([]string, 0)
+	for _, rule := range rules {
+		for _, path := range rule.HTTP.Paths {
+			ret = append(ret, rule.Host+path.Path)
+		}
 	}
 
 	return
