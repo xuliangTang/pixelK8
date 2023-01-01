@@ -10,6 +10,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/helpers"
 	"pixelk8/src/requests"
 )
 
@@ -91,5 +92,20 @@ func (this *SecretService) Show(uri *requests.ShowSecretUri) *dto.SecretShow {
 		Type:      [2]string{string(secret.Type), typeStr},
 		Data:      secret.Data,
 		CreatedAt: secret.CreationTimestamp.Format(athena.DateTimeFormat),
+		Ext:       this.ParseExt(secret),
 	}
+}
+
+// ParseExt 解析secret扩展信息
+func (this *SecretService) ParseExt(secret *coreV1.Secret) any {
+	if string(secret.Type) == string(coreV1.SecretTypeTLS) {
+		if crt, ok := secret.Data["tls.crt"]; ok {
+			crtModel := helpers.ParseCert(crt)
+			if crtModel != nil {
+				return crtModel
+			}
+		}
+	}
+
+	return struct{}{}
 }

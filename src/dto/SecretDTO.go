@@ -13,4 +13,5 @@ type SecretShow struct {
 	Type      [2]string         `json:"type"`
 	CreatedAt string            `json:"created_at"`
 	Data      map[string][]byte `json:"data"`
+	Ext       any               `json:"ext"`
 }
