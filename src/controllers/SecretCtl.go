@@ -3,7 +3,9 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"net/http"
 	"pixelk8/src/properties"
+	"pixelk8/src/requests"
 	"pixelk8/src/services"
 )
 
@@ -24,7 +26,17 @@ func (this *SecretCtl) secrets(ctx *gin.Context) athena.Collection {
 	return this.SecretService.Paging(page, secretList)
 }
 
+func (this *SecretCtl) createSecret(ctx *gin.Context) (athena.HttpCode, any) {
+	req := &requests.CreateSecret{}
+	athena.Error(ctx.BindJSON(req))
+	athena.Error(this.SecretService.Create(req))
+
+	return http.StatusCreated, req
+}
+
 func (this *SecretCtl) Build(athena *athena.Athena) {
 	// secret列表
 	athena.Handle("GET", "/secrets", this.secrets)
+	// 创建secret
+	athena.Handle("POST", "/secret", this.createSecret)
 }

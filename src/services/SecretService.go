@@ -1,17 +1,23 @@
 package services
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/xuliangTang/athena/athena"
+	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/requests"
 )
 
 // SecretService @Service
 type SecretService struct {
-	SecretMap *maps.SecretMap `inject:"-"`
-	Localize  *i18n.Localizer `inject:"-"`
+	SecretMap *maps.SecretMap       `inject:"-"`
+	Localize  *i18n.Localizer       `inject:"-"`
+	K8sClient *kubernetes.Clientset `inject:"-"`
 }
 
 func NewSecretService() *SecretService {
@@ -52,4 +58,21 @@ func (this *SecretService) Paging(page *athena.Page, secretList []*dto.SecretLis
 	start, end := page.SlicePage(iSecList)
 	collection := athena.NewCollection(secretList[start:end], page)
 	return *collection
+}
+
+// Create 创建secret
+func (this *SecretService) Create(req *requests.CreateSecret) error {
+	secret := &coreV1.Secret{
+		ObjectMeta: metaV1.ObjectMeta{
+			Name:      req.Name,
+			Namespace: req.Namespace,
+		},
+		Type:       coreV1.SecretType(req.Type),
+		StringData: req.Data,
+	}
+
+	_, err := this.K8sClient.CoreV1().Secrets(req.Namespace).
+		Create(context.Background(), secret, metaV1.CreateOptions{})
+
+	return err
 }

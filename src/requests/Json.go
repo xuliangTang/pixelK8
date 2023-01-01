@@ -20,3 +20,11 @@ type IngressPath struct {
 	SvcName string `json:"svc_name" binding:"required"`
 	Port    string `json:"port" binding:"required"`
 }
+
+// CreateSecret 创建secret对象
+type CreateSecret struct {
+	Name      string            `json:"name" binding:"required"`
+	Namespace string            `json:"namespace" binding:"required"`
+	Type      string            `json:"type" binding:"required"`
+	Data      map[string]string `json:"data" binding:"required"`
+}
