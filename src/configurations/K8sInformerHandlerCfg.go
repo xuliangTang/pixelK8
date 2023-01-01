@@ -38,3 +38,7 @@ func (*K8sInformerHandlerCfg) InitIngressHandler() *informerHandlers.IngressHand
 func (*K8sInformerHandlerCfg) InitServiceHandler() *informerHandlers.ServiceHandler {
 	return &informerHandlers.ServiceHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitSecretHandler() *informerHandlers.SecretHandler {
+	return &informerHandlers.SecretHandler{}
+}

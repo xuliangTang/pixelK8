@@ -80,3 +80,18 @@ func (this coreV1Service) Less(i, j int) bool {
 func (this coreV1Service) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
+
+// 排序secret 按创建时间
+type coreV1Secret []*coreV1.Secret
+
+func (this coreV1Secret) Len() int {
+	return len(this)
+}
+
+func (this coreV1Secret) Less(i, j int) bool {
+	return this[i].CreationTimestamp.Before(&this[j].CreationTimestamp)
+}
+
+func (this coreV1Secret) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}

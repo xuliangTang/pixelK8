@@ -32,3 +32,7 @@ func (*ServiceCfg) InitIngressService() *services.IngressService {
 func (*ServiceCfg) InitServiceService() *services.ServiceService {
 	return services.NewServiceService()
 }
+
+func (*ServiceCfg) InitSecretService() *services.SecretService {
+	return services.NewSecretService()
+}
