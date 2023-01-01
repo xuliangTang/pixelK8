@@ -76,3 +76,20 @@ func (this *SecretService) Create(req *requests.CreateSecret) error {
 
 	return err
 }
+
+// Show 查看secret
+func (this *SecretService) Show(uri *requests.ShowSecretUri) *dto.SecretShow {
+	secret := this.SecretMap.Find(uri.Namespace, uri.Name)
+
+	typeStr := athena.UnwrapOrEmpty(this.Localize.Localize(&i18n.LocalizeConfig{
+		MessageID: string("k8s.secret.type." + secret.Type),
+	}))
+
+	return &dto.SecretShow{
+		Name:      secret.Name,
+		Namespace: secret.Namespace,
+		Type:      [2]string{string(secret.Type), typeStr},
+		Data:      secret.Data,
+		CreatedAt: secret.CreationTimestamp.Format(athena.DateTimeFormat),
+	}
+}

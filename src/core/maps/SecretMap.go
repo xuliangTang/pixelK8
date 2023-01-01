@@ -60,3 +60,15 @@ func (this *SecretMap) ListByNs(ns string) []*coreV1.Secret {
 	}
 	return []*coreV1.Secret{}
 }
+
+// Find 查找secret
+func (this *SecretMap) Find(ns, name string) *coreV1.Secret {
+	if secList, ok := this.data.Load(ns); ok {
+		for _, sec := range secList.([]*coreV1.Secret) {
+			if sec.Name == name {
+				return sec
+			}
+		}
+	}
+	return &coreV1.Secret{}
+}
