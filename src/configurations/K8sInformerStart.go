@@ -18,6 +18,7 @@ type K8sInformerStart struct {
 	IngressHandler    *informerHandlers.IngressHandler    `inject:"-"`
 	ServiceHandler    *informerHandlers.ServiceHandler    `inject:"-"`
 	SecretHandler     *informerHandlers.SecretHandler     `inject:"-"`
+	ConfigmapHandler  *informerHandlers.ConfigmapHandler  `inject:"-"`
 }
 
 func NewK8sInformerStart() *K8sInformerStart {
@@ -50,6 +51,9 @@ func (this *K8sInformerStart) InitInformer() informers.SharedInformerFactory {
 
 	secretInformer := informerFactory.Core().V1().Secrets()
 	secretInformer.Informer().AddEventHandler(this.SecretHandler)
+
+	configmapInformer := informerFactory.Core().V1().ConfigMaps()
+	configmapInformer.Informer().AddEventHandler(this.ConfigmapHandler)
 
 	informerFactory.Start(wait.NeverStop)
 

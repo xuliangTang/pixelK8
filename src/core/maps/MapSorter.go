@@ -95,3 +95,18 @@ func (this coreV1Secret) Less(i, j int) bool {
 func (this coreV1Secret) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
+
+// 排序configmap 按创建时间
+type coreV1Configmap []*coreV1.ConfigMap
+
+func (this coreV1Configmap) Len() int {
+	return len(this)
+}
+
+func (this coreV1Configmap) Less(i, j int) bool {
+	return this[i].CreationTimestamp.Before(&this[j].CreationTimestamp)
+}
+
+func (this coreV1Configmap) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}

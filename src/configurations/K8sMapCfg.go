@@ -40,3 +40,7 @@ func (*K8sMapCfg) InitServiceMap() *maps.ServiceMap {
 func (*K8sMapCfg) InitSecretMap() *maps.SecretMap {
 	return &maps.SecretMap{}
 }
+
+func (*K8sMapCfg) InitConfigmapMap() *maps.ConfigmapMap {
+	return &maps.ConfigmapMap{}
+}

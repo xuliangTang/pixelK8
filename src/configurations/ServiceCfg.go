@@ -36,3 +36,7 @@ func (*ServiceCfg) InitServiceService() *services.ServiceService {
 func (*ServiceCfg) InitSecretService() *services.SecretService {
 	return services.NewSecretService()
 }
+
+func (*ServiceCfg) InitConfigmapService() *services.ConfigmapService {
+	return services.NewConfigmapService()
+}
