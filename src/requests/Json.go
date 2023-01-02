@@ -34,4 +34,5 @@ type CreateConfigmap struct {
 	Name      string            `json:"name" binding:"required"`
 	Namespace string            `json:"namespace" binding:"required"`
 	Data      map[string]string `json:"data" binding:"required"`
+	IsEdit    *bool             `json:"is_edit"`
 }

@@ -64,8 +64,14 @@ func (this *ConfigmapService) Create(req *requests.CreateConfigmap) error {
 		Data: req.Data,
 	}
 
-	_, err := this.K8sClient.CoreV1().ConfigMaps(req.Namespace).
-		Create(context.Background(), configmap, metaV1.CreateOptions{})
+	var err error
+	if *req.IsEdit {
+		_, err = this.K8sClient.CoreV1().ConfigMaps(req.Namespace).
+			Update(context.Background(), configmap, metaV1.UpdateOptions{})
+	} else {
+		_, err = this.K8sClient.CoreV1().ConfigMaps(req.Namespace).
+			Create(context.Background(), configmap, metaV1.CreateOptions{})
+	}
 
 	return err
 }
