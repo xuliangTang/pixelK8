@@ -3,6 +3,8 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"io"
+	"net/http"
 	"pixelk8/src/properties"
 	"pixelk8/src/requests"
 	"pixelk8/src/services"
@@ -32,14 +34,29 @@ func (this *PodCtl) podAllContainers(ctx *gin.Context) any {
 	return this.PodService.GetPodContainers(uri)
 }
 
-func (this *PodCtl) podContainerLogs(ctx *gin.Context) any {
+func (this *PodCtl) podContainerLogs(ctx *gin.Context) athena.HttpCode {
 	uri := &requests.PodContainersLogsUri{}
 	query := &requests.PodContainerLogsQuery{}
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(ctx.BindQuery(query))
 
-	ret := athena.Unwrap(this.PodService.GetPodContainerLog(uri, query)).([]byte)
-	return string(ret)
+	req := this.PodService.GetPodContainerLog(uri, query)
+
+	reader, err := req.Stream(ctx)
+	athena.Error(err)
+	for {
+		buf := make([]byte, 1024)
+		n, err := reader.Read(buf)
+		if err != nil && err != io.EOF {
+			break
+		}
+		if n > 0 {
+			ctx.Writer.Write(buf[0:n])
+			ctx.Writer.(http.Flusher).Flush()
+		}
+	}
+
+	return http.StatusOK
 }
 
 func (this *PodCtl) Build(athena *athena.Athena) {
