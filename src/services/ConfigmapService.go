@@ -31,6 +31,7 @@ func (this *ConfigmapService) ListByNs(ns string) (ret []*dto.ConfigmapList) {
 		ret[i] = &dto.ConfigmapList{
 			Name:      cm.Name,
 			Namespace: cm.Namespace,
+			Keys:      this.getKeys(cm),
 			CreatedAt: cm.CreationTimestamp.Format(athena.DateTimeFormat),
 		}
 	}
@@ -86,4 +87,13 @@ func (this *ConfigmapService) Show(uri *requests.ShowConfigmapUri) *dto.Configma
 		CreatedAt: configmap.CreationTimestamp.Format(athena.DateTimeFormat),
 		Data:      configmap.Data,
 	}
+}
+
+// 获取configmap data中所有key
+func (this *ConfigmapService) getKeys(cm *coreV1.ConfigMap) (ret []string) {
+	for k := range cm.Data {
+		ret = append(ret, k)
+	}
+
+	return
 }
