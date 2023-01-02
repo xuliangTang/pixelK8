@@ -14,3 +14,7 @@ type PodList struct {
 	Message   string `json:"message"`
 	CreatedAt string `json:"created_at"`
 }
+
+type PodContainerList struct {
+	Name string `json:"name"`
+}

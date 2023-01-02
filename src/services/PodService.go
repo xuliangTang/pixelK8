@@ -7,6 +7,7 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/requests"
 )
 
 // PodService @Service
@@ -86,6 +87,19 @@ func (*PodService) CheckPodReady(pod *coreV1.Pod) bool {
 	}
 
 	return true
+}
+
+// GetPodContainers 获取pod所有容器
+func (this *PodService) GetPodContainers(uri *requests.PodAllContainersUri) (ret []*dto.PodContainerList) {
+	pod := this.PodMap.Find(uri.Namespace, uri.Name)
+	ret = make([]*dto.PodContainerList, 0)
+	for _, c := range pod.Spec.Containers {
+		ret = append(ret, &dto.PodContainerList{
+			Name: c.Name,
+		})
+	}
+
+	return
 }
 
 // 将原生pods列表转换为dto对象

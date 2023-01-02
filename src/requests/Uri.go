@@ -13,3 +13,8 @@ type ShowConfigmapUri struct {
 	Namespace string `uri:"ns" binding:"required"`
 	Name      string `uri:"configmap" binding:"required"`
 }
+
+type PodAllContainersUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"pod" binding:"required"`
+}
