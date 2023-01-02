@@ -28,3 +28,10 @@ type CreateSecret struct {
 	Type      string            `json:"type" binding:"required"`
 	Data      map[string]string `json:"data" binding:"required"`
 }
+
+// CreateConfigmap 创建configmap对象
+type CreateConfigmap struct {
+	Name      string            `json:"name" binding:"required"`
+	Namespace string            `json:"namespace" binding:"required"`
+	Data      map[string]string `json:"data" binding:"required"`
+}

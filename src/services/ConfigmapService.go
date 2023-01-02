@@ -1,15 +1,21 @@
 package services
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/requests"
 )
 
 // ConfigmapService @Service
 type ConfigmapService struct {
-	CmMap *maps.ConfigmapMap `inject:"-"`
+	CmMap     *maps.ConfigmapMap    `inject:"-"`
+	K8sClient *kubernetes.Clientset `inject:"-"`
 }
 
 func NewConfigmapService() *ConfigmapService {
@@ -46,4 +52,20 @@ func (this *ConfigmapService) Paging(page *athena.Page, cmList []*dto.ConfigmapL
 	start, end := page.SlicePage(iCmList)
 	collection := athena.NewCollection(cmList[start:end], page)
 	return *collection
+}
+
+// Create 创建configmap
+func (this *ConfigmapService) Create(req *requests.CreateConfigmap) error {
+	configmap := &coreV1.ConfigMap{
+		ObjectMeta: metaV1.ObjectMeta{
+			Name:      req.Name,
+			Namespace: req.Namespace,
+		},
+		Data: req.Data,
+	}
+
+	_, err := this.K8sClient.CoreV1().ConfigMaps(req.Namespace).
+		Create(context.Background(), configmap, metaV1.CreateOptions{})
+
+	return err
 }
