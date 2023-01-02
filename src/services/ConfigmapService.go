@@ -91,6 +91,7 @@ func (this *ConfigmapService) Show(uri *requests.ShowConfigmapUri) *dto.Configma
 
 // 获取configmap data中所有key
 func (this *ConfigmapService) getKeys(cm *coreV1.ConfigMap) (ret []string) {
+	ret = make([]string, 0)
 	for k := range cm.Data {
 		ret = append(ret, k)
 	}
