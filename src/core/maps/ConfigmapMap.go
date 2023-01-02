@@ -29,7 +29,7 @@ func (this *ConfigmapMap) Update(cm *coreV1.ConfigMap) bool {
 	if cmList, ok := this.data.Load(cm.Namespace); ok {
 		cmList := cmList.([]*coreV1.ConfigMap)
 		for i, c := range cmList {
-			if c.Name == cm.Name && this.Md5Data(c.Data) == this.Md5Data(cm.Data) {
+			if c.Name == cm.Name && this.Md5Data(c.Data) != this.Md5Data(cm.Data) {
 				cmList[i] = cm
 				return true
 			}
