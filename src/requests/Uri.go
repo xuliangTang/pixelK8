@@ -18,3 +18,8 @@ type PodAllContainersUri struct {
 	Namespace string `uri:"ns" binding:"required"`
 	Name      string `uri:"pod" binding:"required"`
 }
+
+type PodContainersLogsUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"pod" binding:"required"`
+}

@@ -32,9 +32,21 @@ func (this *PodCtl) podAllContainers(ctx *gin.Context) any {
 	return this.PodService.GetPodContainers(uri)
 }
 
+func (this *PodCtl) podContainerLogs(ctx *gin.Context) any {
+	uri := &requests.PodContainersLogsUri{}
+	query := &requests.PodContainerLogsQuery{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(ctx.BindQuery(query))
+
+	ret := athena.Unwrap(this.PodService.GetPodContainerLog(uri, query)).([]byte)
+	return string(ret)
+}
+
 func (this *PodCtl) Build(athena *athena.Athena) {
 	// 获取pod列表
 	athena.Handle("GET", "/pods", this.pods)
 	// 获取pod所有容器
 	athena.Handle("GET", "/pod/:ns/:pod/containers", this.podAllContainers)
+	// 获取pod容器日志
+	athena.Handle("GET", "/pod/:ns/:pod/logs", this.podContainerLogs)
 }

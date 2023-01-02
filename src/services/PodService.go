@@ -1,10 +1,12 @@
 package services
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	appsV1 "k8s.io/api/apps/v1"
 	coreV1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
 	"pixelk8/src/requests"
@@ -12,11 +14,12 @@ import (
 
 // PodService @Service
 type PodService struct {
-	DeploymentMap *maps.DeploymentMap `inject:"-"`
-	ReplicaSetMap *maps.ReplicaSetMap `inject:"-"`
-	PodMap        *maps.PodMap        `inject:"-"`
-	EventMap      *maps.EventMap      `inject:"-"`
-	CommonService *CommonService      `inject:"-"`
+	DeploymentMap *maps.DeploymentMap   `inject:"-"`
+	ReplicaSetMap *maps.ReplicaSetMap   `inject:"-"`
+	PodMap        *maps.PodMap          `inject:"-"`
+	EventMap      *maps.EventMap        `inject:"-"`
+	CommonService *CommonService        `inject:"-"`
+	K8sClient     *kubernetes.Clientset `inject:"-"`
 }
 
 func NewPodService() *PodService {
@@ -100,6 +103,17 @@ func (this *PodService) GetPodContainers(uri *requests.PodAllContainersUri) (ret
 	}
 
 	return
+}
+
+// GetPodContainerLog 获取pod容器日志
+func (this *PodService) GetPodContainerLog(uri *requests.PodContainersLogsUri, query *requests.PodContainerLogsQuery) ([]byte, error) {
+	req := this.K8sClient.CoreV1().Pods(uri.Namespace).
+		GetLogs(uri.Name, &coreV1.PodLogOptions{
+			Container: query.ContainerName,
+		})
+
+	ret := req.Do(context.Background())
+	return ret.Raw()
 }
 
 // 将原生pods列表转换为dto对象
