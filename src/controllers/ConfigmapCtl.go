@@ -34,9 +34,18 @@ func (this *ConfigmapCtl) createConfigmap(ctx *gin.Context) (athena.HttpCode, an
 	return http.StatusCreated, req
 }
 
+func (this *ConfigmapCtl) showConfigmap(ctx *gin.Context) any {
+	uri := &requests.ShowConfigmapUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	return this.CmSvc.Show(uri)
+}
+
 func (this *ConfigmapCtl) Build(athena *athena.Athena) {
 	// configmap列表
 	athena.Handle("GET", "/configmaps", this.configmaps)
 	// 创建configmap
 	athena.Handle("POST", "/configmap", this.createConfigmap)
+	// 查看configmap
+	athena.Handle("GET", "/configmap/:ns/:configmap", this.showConfigmap)
 }

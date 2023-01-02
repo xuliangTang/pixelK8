@@ -8,3 +8,8 @@ type ShowSecretUri struct {
 	Namespace string `uri:"ns" binding:"required"`
 	Name      string `uri:"secret" binding:"required"`
 }
+
+type ShowConfigmapUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"configmap" binding:"required"`
+}

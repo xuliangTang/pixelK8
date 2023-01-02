@@ -69,3 +69,15 @@ func (this *ConfigmapService) Create(req *requests.CreateConfigmap) error {
 
 	return err
 }
+
+// Show 查看configmap
+func (this *ConfigmapService) Show(uri *requests.ShowConfigmapUri) *dto.ConfigmapShow {
+	configmap := this.CmMap.Find(uri.Namespace, uri.Name)
+
+	return &dto.ConfigmapShow{
+		Name:      configmap.Name,
+		Namespace: configmap.Namespace,
+		CreatedAt: configmap.CreationTimestamp.Format(athena.DateTimeFormat),
+		Data:      configmap.Data,
+	}
+}
