@@ -1,18 +1,23 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/requests"
 )
 
 // ServiceService @Service
 type ServiceService struct {
-	SvcMap    *maps.ServiceMap `inject:"-"`
-	CommonSvc *CommonService   `inject:"-"`
+	SvcMap    *maps.ServiceMap      `inject:"-"`
+	CommonSvc *CommonService        `inject:"-"`
+	K8sClient *kubernetes.Clientset `inject:"-"`
 }
 
 func NewServiceService() *ServiceService {
@@ -52,6 +57,12 @@ func (this *ServiceService) Paging(page *athena.Page, svcList []*dto.ServiceList
 	start, end := page.SlicePage(iSvcList)
 	collection := athena.NewCollection(svcList[start:end], page)
 	return *collection
+}
+
+// Delete 删除service
+func (this *ServiceService) Delete(uri *requests.DeleteServiceUri) error {
+	return this.K8sClient.CoreV1().Services(uri.Namespace).
+		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
 }
 
 // 拼接service target

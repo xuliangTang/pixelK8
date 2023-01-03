@@ -3,7 +3,9 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"net/http"
 	"pixelk8/src/properties"
+	"pixelk8/src/requests"
 	"pixelk8/src/services"
 )
 
@@ -29,9 +31,19 @@ func (this *ServiceCtl) services(ctx *gin.Context) athena.Collection {
 	return this.SvcService.Paging(page, svcList)
 }
 
+func (this *ServiceCtl) deleteService(ctx *gin.Context) athena.HttpCode {
+	uri := &requests.DeleteServiceUri{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.SvcService.Delete(uri))
+
+	return http.StatusNoContent
+}
+
 func (this *ServiceCtl) Build(athena *athena.Athena) {
 	// 获取所有services
 	athena.Handle("GET", "/service/all", this.serviceAll)
 	// service列表
 	athena.Handle("GET", "/services", this.services)
+	// 删除service
+	athena.Handle("DELETE", "/service/:ns/:service", this.deleteService)
 }

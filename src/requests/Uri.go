@@ -48,3 +48,8 @@ type DeleteConfigmapUri struct {
 	Namespace string `uri:"ns" binding:"required"`
 	Name      string `uri:"configmap" binding:"required"`
 }
+
+type DeleteServiceUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"service" binding:"required"`
+}
