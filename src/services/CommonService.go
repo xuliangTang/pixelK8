@@ -71,3 +71,13 @@ func (*CommonService) ParseAnnotations(annotations string) (ret map[string]strin
 
 	return
 }
+
+// SelectorToStrings 转换selector map为切片
+func (*CommonService) SelectorToStrings(m map[string]string) (ret []string) {
+	ret = make([]string, 0)
+	for k, v := range m {
+		ret = append(ret, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	return ret
+}
