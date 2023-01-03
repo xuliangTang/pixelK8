@@ -6,3 +6,5 @@ application.yml
 test.go
 static.go
 run.bat
+
+kubeconfig
