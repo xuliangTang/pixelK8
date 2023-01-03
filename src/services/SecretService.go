@@ -96,6 +96,12 @@ func (this *SecretService) Show(uri *requests.ShowSecretUri) *dto.SecretShow {
 	}
 }
 
+// Delete 删除secret
+func (this *SecretService) Delete(uri *requests.DeleteSecretUri) error {
+	return this.K8sClient.CoreV1().Secrets(uri.Namespace).
+		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
+}
+
 // ParseExt 解析secret扩展信息
 func (this *SecretService) ParseExt(secret *coreV1.Secret) any {
 	if string(secret.Type) == string(coreV1.SecretTypeTLS) {

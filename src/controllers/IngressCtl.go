@@ -34,9 +34,19 @@ func (this *IngressCtl) createIngress(ctx *gin.Context) (athena.HttpCode, any) {
 	return http.StatusCreated, req
 }
 
+func (this *IngressCtl) deleteIngress(ctx *gin.Context) athena.HttpCode {
+	uri := &requests.DeleteIngressUri{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.IngSvc.Delete(uri))
+
+	return http.StatusNoContent
+}
+
 func (this *IngressCtl) Build(athena *athena.Athena) {
 	// ingress列表
 	athena.Handle("GET", "/ingress", this.ingress)
 	// 创建ingress
 	athena.Handle("POST", "/ingress", this.createIngress)
+	// 删除ingress
+	athena.Handle("DELETE", "/ingress/:ns/:ingress", this.deleteIngress)
 }

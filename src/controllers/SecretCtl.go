@@ -41,6 +41,14 @@ func (this *SecretCtl) showSecret(ctx *gin.Context) any {
 	return this.SecretService.Show(uri)
 }
 
+func (this *SecretCtl) deleteSecret(ctx *gin.Context) athena.HttpCode {
+	uri := &requests.DeleteSecretUri{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.SecretService.Delete(uri))
+
+	return http.StatusNoContent
+}
+
 func (this *SecretCtl) Build(athena *athena.Athena) {
 	// secret列表
 	athena.Handle("GET", "/secrets", this.secrets)
@@ -48,4 +56,6 @@ func (this *SecretCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/secret", this.createSecret)
 	// 查看secret
 	athena.Handle("GET", "/secret/:ns/:secret", this.showSecret)
+	// 删除secret
+	athena.Handle("DELETE", "/secret/:ns/:secret", this.deleteSecret)
 }

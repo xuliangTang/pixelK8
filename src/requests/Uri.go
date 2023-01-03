@@ -23,3 +23,28 @@ type PodContainersLogsUri struct {
 	Namespace string `uri:"ns" binding:"required"`
 	Name      string `uri:"pod" binding:"required"`
 }
+
+type DeleteDeploymentUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"deployment" binding:"required"`
+}
+
+type DeletePodUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"pod" binding:"required"`
+}
+
+type DeleteIngressUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"ingress" binding:"required"`
+}
+
+type DeleteSecretUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"secret" binding:"required"`
+}
+
+type DeleteConfigmapUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"configmap" binding:"required"`
+}

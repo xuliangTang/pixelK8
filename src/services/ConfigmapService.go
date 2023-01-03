@@ -89,6 +89,12 @@ func (this *ConfigmapService) Show(uri *requests.ShowConfigmapUri) *dto.Configma
 	}
 }
 
+// Delete 删除configmap
+func (this *ConfigmapService) Delete(uri *requests.DeleteConfigmapUri) error {
+	return this.K8sClient.CoreV1().ConfigMaps(uri.Namespace).
+		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
+}
+
 // 获取configmap data中所有key
 func (this *ConfigmapService) getKeys(cm *coreV1.ConfigMap) (ret []string) {
 	ret = make([]string, 0)

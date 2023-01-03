@@ -123,6 +123,12 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 	return err
 }
 
+// Delete 删除ingress
+func (this *IngressService) Delete(uri *requests.DeleteIngressUri) error {
+	return this.K8sClient.NetworkingV1().Ingresses(uri.Namespace).
+		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
+}
+
 // 拼接ingress host
 func (*IngressService) joinRuleHosts(rules []networkingV1.IngressRule) (ret []string) {
 	ret = make([]string, 0)

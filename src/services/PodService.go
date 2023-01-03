@@ -1,10 +1,12 @@
 package services
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	appsV1 "k8s.io/api/apps/v1"
 	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"pixelk8/src/core/maps"
@@ -119,13 +121,19 @@ func (this *PodService) GetPodContainerLog(uri *requests.PodContainersLogsUri, q
 	return req
 }
 
+// Delete 删除pod
+func (this *PodService) Delete(uri *requests.DeletePodUri) error {
+	return this.K8sClient.CoreV1().Pods(uri.Namespace).
+		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
+}
+
 // 将原生pods列表转换为dto对象
 func (this *PodService) convertPodList(podList []*coreV1.Pod) (ret []*dto.PodList) {
 	ret = make([]*dto.PodList, len(podList))
 	for i, pod := range podList {
 		ret[i] = &dto.PodList{
 			Name:      pod.Name,
-			NameSpace: pod.Namespace,
+			Namespace: pod.Namespace,
 			NodeName:  pod.Spec.NodeName,
 			Images:    this.CommonService.GetImageShortName(pod.Spec.Containers),
 			Ip:        [2]string{pod.Status.PodIP, pod.Status.HostIP},

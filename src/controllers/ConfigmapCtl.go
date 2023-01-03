@@ -41,6 +41,14 @@ func (this *ConfigmapCtl) showConfigmap(ctx *gin.Context) any {
 	return this.CmSvc.Show(uri)
 }
 
+func (this *ConfigmapCtl) deleteConfigmap(ctx *gin.Context) athena.HttpCode {
+	uri := &requests.DeleteConfigmapUri{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.CmSvc.Delete(uri))
+
+	return http.StatusNoContent
+}
+
 func (this *ConfigmapCtl) Build(athena *athena.Athena) {
 	// configmap列表
 	athena.Handle("GET", "/configmaps", this.configmaps)
@@ -48,4 +56,6 @@ func (this *ConfigmapCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/configmap", this.createConfigmap)
 	// 查看configmap
 	athena.Handle("GET", "/configmap/:ns/:configmap", this.showConfigmap)
+	// 删除configmap
+	athena.Handle("DELETE", "/configmap/:ns/:configmap", this.deleteConfigmap)
 }

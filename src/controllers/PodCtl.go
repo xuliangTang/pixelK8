@@ -59,6 +59,14 @@ func (this *PodCtl) podContainerLogs(ctx *gin.Context) athena.HttpCode {
 	return http.StatusOK
 }
 
+func (this *PodCtl) deletePod(ctx *gin.Context) athena.HttpCode {
+	uri := &requests.DeletePodUri{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.PodService.Delete(uri))
+
+	return http.StatusNoContent
+}
+
 func (this *PodCtl) Build(athena *athena.Athena) {
 	// 获取pod列表
 	athena.Handle("GET", "/pods", this.pods)
@@ -66,4 +74,6 @@ func (this *PodCtl) Build(athena *athena.Athena) {
 	athena.Handle("GET", "/pod/:ns/:pod/containers", this.podAllContainers)
 	// 获取pod容器日志
 	athena.Handle("GET", "/pod/:ns/:pod/logs", this.podContainerLogs)
+	// 删除pod
+	athena.Handle("DELETE", "/pod/:ns/:pod", this.deletePod)
 }

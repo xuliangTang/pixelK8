@@ -2,7 +2,7 @@ package dto
 
 type PodList struct {
 	Name      string `json:"name"`
-	NameSpace string `json:"name_space"`
+	Namespace string `json:"namespace"`
 	NodeName  string `json:"node_name"`
 	Images    string `json:"images"`
 	// 0 podIp 1 hostIp

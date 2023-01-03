@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"net/http"
 	"pixelk8/src/properties"
 	"pixelk8/src/requests"
 	"pixelk8/src/services"
@@ -34,9 +35,19 @@ func (this *DeploymentCtl) deploymentPods(ctx *gin.Context) any {
 	return podList
 }
 
+func (this *DeploymentCtl) deleteDeployment(ctx *gin.Context) athena.HttpCode {
+	uri := &requests.DeleteDeploymentUri{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.DeploymentService.Delete(uri))
+
+	return http.StatusNoContent
+}
+
 func (this *DeploymentCtl) Build(athena *athena.Athena) {
 	// Deployment 列表
 	athena.Handle("GET", "/deployments", this.deployments)
 	// Deployment Pod 列表
 	athena.Handle("GET", "/deployment/:deployment/pods", this.deploymentPods)
+	// 删除 Deployment
+	athena.Handle("DELETE", "/deployment/:ns/:deployment", this.deleteDeployment)
 }

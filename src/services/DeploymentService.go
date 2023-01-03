@@ -1,17 +1,22 @@
 package services
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	appsV1 "k8s.io/api/apps/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/requests"
 )
 
 // DeploymentService @service
 type DeploymentService struct {
-	DeploymentMap *maps.DeploymentMap `inject:"-"`
-	CommonService *CommonService      `inject:"-"`
+	DeploymentMap *maps.DeploymentMap   `inject:"-"`
+	CommonService *CommonService        `inject:"-"`
+	K8sClient     *kubernetes.Clientset `inject:"-"`
 }
 
 func NewDeploymentService() *DeploymentService {
@@ -54,6 +59,12 @@ func (this *DeploymentService) Paging(page *athena.Page, depList []*dto.Deployme
 	start, end := page.SlicePage(iDepList)
 	collection := athena.NewCollection(depList[start:end], page)
 	return *collection
+}
+
+// Delete 删除deployment
+func (this *DeploymentService) Delete(uri *requests.DeleteDeploymentUri) error {
+	return this.K8sClient.AppsV1().Deployments(uri.Namespace).
+		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
 }
 
 // 评估deployment是否就绪
