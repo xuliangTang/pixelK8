@@ -27,6 +27,7 @@ type CreateSecret struct {
 	Namespace string            `json:"namespace" binding:"required"`
 	Type      string            `json:"type" binding:"required"`
 	Data      map[string]string `json:"data" binding:"required"`
+	IsEdit    *bool             `json:"is_edit"`
 }
 
 // CreateConfigmap 创建configmap对象

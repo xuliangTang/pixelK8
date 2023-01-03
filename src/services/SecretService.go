@@ -72,8 +72,14 @@ func (this *SecretService) Create(req *requests.CreateSecret) error {
 		StringData: req.Data,
 	}
 
-	_, err := this.K8sClient.CoreV1().Secrets(req.Namespace).
-		Create(context.Background(), secret, metaV1.CreateOptions{})
+	var err error
+	if *req.IsEdit {
+		_, err = this.K8sClient.CoreV1().Secrets(req.Namespace).
+			Update(context.Background(), secret, metaV1.UpdateOptions{})
+	} else {
+		_, err = this.K8sClient.CoreV1().Secrets(req.Namespace).
+			Create(context.Background(), secret, metaV1.CreateOptions{})
+	}
 
 	return err
 }
