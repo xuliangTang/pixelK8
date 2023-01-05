@@ -40,3 +40,7 @@ func (*ServiceCfg) InitSecretService() *services.SecretService {
 func (*ServiceCfg) InitConfigmapService() *services.ConfigmapService {
 	return services.NewConfigmapService()
 }
+
+func (*ServiceCfg) InitNodeService() *services.NodeService {
+	return services.NewNodeService()
+}

@@ -46,3 +46,7 @@ func (*K8sInformerHandlerCfg) InitSecretHandler() *informerHandlers.SecretHandle
 func (*K8sInformerHandlerCfg) InitConfigmapHandler() *informerHandlers.ConfigmapHandler {
 	return &informerHandlers.ConfigmapHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitNodeHandler() *informerHandlers.NodeHandler {
+	return &informerHandlers.NodeHandler{}
+}

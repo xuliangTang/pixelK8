@@ -110,3 +110,18 @@ func (this coreV1Configmap) Less(i, j int) bool {
 func (this coreV1Configmap) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
+
+// 排序node 按创建时间
+type coreV1Node []*coreV1.Node
+
+func (this coreV1Node) Len() int {
+	return len(this)
+}
+
+func (this coreV1Node) Less(i, j int) bool {
+	return this[i].CreationTimestamp.Before(&this[j].CreationTimestamp)
+}
+
+func (this coreV1Node) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}

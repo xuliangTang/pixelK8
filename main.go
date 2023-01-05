@@ -27,7 +27,8 @@ func main() {
 			controllers.NewIngressCtl(),
 			controllers.NewServiceCtl(),
 			controllers.NewSecretCtl(),
-			controllers.NewConfigmapCtl())
+			controllers.NewConfigmapCtl(),
+			controllers.NewNodeCtl())
 
 	/*server.GET("/c/*filepath", func(context *gin.Context) {
 		http.FileServer(FS(false)).ServeHTTP(context.Writer, context.Request)
