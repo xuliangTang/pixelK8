@@ -113,10 +113,14 @@ func (this *PodService) GetPodContainers(uri *requests.PodAllContainersUri) (ret
 
 // GetPodContainerLog 获取pod容器日志
 func (this *PodService) GetPodContainerLog(uri *requests.PodContainersLogsUri, query *requests.PodContainerLogsQuery) *rest.Request {
+	var tailLine int64 // 从日志末尾开始展示的行数
+	tailLine = 200
+
 	req := this.K8sClient.CoreV1().Pods(uri.Namespace).
 		GetLogs(uri.Name, &coreV1.PodLogOptions{
 			Container: query.ContainerName,
 			Follow:    true,
+			TailLines: &tailLine,
 		})
 
 	// ret := req.Do(context.Background())

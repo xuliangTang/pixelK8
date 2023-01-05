@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"pixelk8/src/properties"
 	"pixelk8/src/requests"
 	"pixelk8/src/services"
+	"time"
 )
 
 // PodCtl @Controller
@@ -40,20 +42,24 @@ func (this *PodCtl) podContainerLogs(ctx *gin.Context) athena.HttpCode {
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(ctx.BindQuery(query))
 
+	cc, _ := context.WithTimeout(ctx, time.Minute*30) // 设置超时时间
 	req := this.PodService.GetPodContainerLog(uri, query)
 
-	reader, err := req.Stream(ctx)
+	reader, err := req.Stream(cc)
 	athena.Error(err)
+	defer reader.Close()
 	for {
 		buf := make([]byte, 1024)
 		n, err := reader.Read(buf)
 		if err != nil && err != io.EOF {
 			break
 		}
-		if n > 0 {
-			ctx.Writer.Write(buf[0:n])
-			ctx.Writer.(http.Flusher).Flush()
+		w, err := ctx.Writer.Write(buf[0:n])
+		if w == 0 || err != nil {
+			break
 		}
+
+		ctx.Writer.(http.Flusher).Flush()
 	}
 
 	return http.StatusOK
