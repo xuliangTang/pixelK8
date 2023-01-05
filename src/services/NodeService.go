@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"golang.org/x/crypto/ssh"
+	"net"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
 )
@@ -47,4 +49,39 @@ func (this *NodeService) Paging(page *athena.Page, nodeList []*dto.NodeList) ath
 	start, end := page.SlicePage(iNodeList)
 	collection := athena.NewCollection(nodeList[start:end], page)
 	return *collection
+}
+
+// SSHConnect 获取SSH连接
+func (*NodeService) SSHConnect(user, password, host string, port int) (*ssh.Session, error) {
+	var (
+		auth         []ssh.AuthMethod
+		addr         string
+		clientConfig *ssh.ClientConfig
+		client       *ssh.Client
+		session      *ssh.Session
+		err          error
+	)
+
+	// get auth method
+	auth = make([]ssh.AuthMethod, 0)
+	auth = append(auth, ssh.Password(password))
+	hostKeyCallback := func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+		return nil
+	}
+	clientConfig = &ssh.ClientConfig{
+		User: user,
+		Auth: auth,
+		// Timeout:             30 * time.Second,
+		HostKeyCallback: hostKeyCallback,
+	}
+
+	// connect to ssh
+	addr = fmt.Sprintf("%s:%d", host, port)
+	if client, err = ssh.Dial("tcp", addr, clientConfig); err != nil {
+		return nil, err
+	}
+	if session, err = client.NewSession(); err != nil {
+		return nil, err
+	}
+	return session, nil
 }

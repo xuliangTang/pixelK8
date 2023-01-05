@@ -13,6 +13,14 @@ type K8sOpt struct {
 	Port           int32
 	DefaultNs      string
 	KubeConfigPath string
+	Nodes          map[string]*NodeOpt `mapstructure:"nodes"`
+}
+
+type NodeOpt struct {
+	Username string
+	Password string
+	Host     string
+	Port     int
 }
 
 func (*AppProperties) InitDefaultConfig(viper *viper.Viper) {}

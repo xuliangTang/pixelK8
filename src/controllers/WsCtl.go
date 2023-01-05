@@ -3,9 +3,11 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"golang.org/x/crypto/ssh"
 	"k8s.io/client-go/tools/remotecommand"
 	"log"
 	"net/http"
+	"pixelk8/src/properties"
 	"pixelk8/src/requests"
 	"pixelk8/src/services"
 	"pixelk8/src/ws"
@@ -13,7 +15,8 @@ import (
 
 // WsCtl @Controller
 type WsCtl struct {
-	PodService *services.PodService `inject:"-"`
+	PodService  *services.PodService  `inject:"-"`
+	NodeService *services.NodeService `inject:"-"`
 }
 
 func NewWsCtl() *WsCtl {
@@ -58,8 +61,54 @@ func (this *WsCtl) podContainerTerminal(ctx *gin.Context) athena.HttpCode {
 	return http.StatusOK
 }
 
+func (this *WsCtl) nodeTerminal(ctx *gin.Context) athena.HttpCode {
+	uri := &requests.NodeTerminalUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	wsClient, err := ws.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
+		return http.StatusBadRequest
+	}
+
+	nodeInfo, ok := properties.App.K8s.Nodes[uri.Name]
+	if !ok {
+		return http.StatusBadRequest
+	}
+
+	shellClient := ws.NewWsShellClient(wsClient)
+	session, err := this.NodeService.SSHConnect(nodeInfo.Username, nodeInfo.Password, nodeInfo.Host, nodeInfo.Port)
+	if err != nil {
+		return http.StatusBadRequest
+	}
+
+	defer session.Close()
+	session.Stdout = shellClient
+	session.Stderr = shellClient
+	session.Stdin = shellClient
+
+	var nodeShellModes = ssh.TerminalModes{
+		ssh.ECHO:          1,     // enable echoing
+		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+		ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+	}
+
+	err = session.RequestPty("xterm-256color", 300, 500, nodeShellModes)
+	if err != nil {
+		return http.StatusBadRequest
+	}
+
+	err = session.Run("sh")
+	if err != nil {
+		return http.StatusBadRequest
+	}
+
+	return http.StatusOK
+}
+
 func (this *WsCtl) Build(athena *athena.Athena) {
 	athena.Handle("GET", "/ws", this.connect)
 	// 连接pod容器终端
 	athena.Handle("GET", "/ws/pod/:ns/:pod/terminal", this.podContainerTerminal)
+	// 连接node终端
+	athena.Handle("GET", "/ws/node/:node/terminal", this.nodeTerminal)
 }
