@@ -9,9 +9,10 @@ type AppProperties struct {
 }
 
 type K8sOpt struct {
-	Host      string
-	Port      int32
-	DefaultNs string
+	Host           string
+	Port           int32
+	DefaultNs      string
+	KubeConfigPath string
 }
 
 func (*AppProperties) InitDefaultConfig(viper *viper.Viper) {}

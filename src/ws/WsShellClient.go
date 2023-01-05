@@ -13,7 +13,7 @@ func NewWsShellClient(client *websocket.Conn) *WsShellClient {
 }
 
 func (this *WsShellClient) Write(p []byte) (n int, err error) {
-	err = this.client.WriteMessage(websocket.BinaryMessage, p)
+	err = this.client.WriteMessage(websocket.TextMessage, p)
 	if err != nil {
 		return 0, err
 	}

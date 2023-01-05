@@ -8,9 +8,13 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/remotecommand"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/properties"
 	"pixelk8/src/requests"
 )
 
@@ -125,6 +129,36 @@ func (this *PodService) GetPodContainerLog(uri *requests.PodContainersLogsUri, q
 func (this *PodService) Delete(uri *requests.DeletePodUri) error {
 	return this.K8sClient.CoreV1().Pods(uri.Namespace).
 		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
+}
+
+// HandlerCommand 初始化一个Executor，用于与pod容器终端建立长连接
+func (this *PodService) HandlerCommand(uri *requests.PodContainerTerminalUri, query *requests.PodContainerTerminalQuery) (remotecommand.Executor, error) {
+	config, err := clientcmd.BuildConfigFromFlags("", properties.App.K8s.KubeConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	option := &coreV1.PodExecOptions{
+		Container: query.ContainerName,
+		Command:   []string{"sh"},
+		Stdin:     true,
+		Stdout:    true,
+		Stderr:    true,
+		TTY:       true,
+	}
+
+	req := this.K8sClient.CoreV1().RESTClient().Post().Resource("pods").
+		Namespace(uri.Namespace).
+		Name(uri.Name).
+		SubResource("exec").
+		VersionedParams(option, scheme.ParameterCodec)
+
+	exec, err := remotecommand.NewSPDYExecutor(config, "POST", req.URL())
+	if err != nil {
+		return nil, err
+	}
+
+	return exec, nil
 }
 
 // 将原生pods列表转换为dto对象

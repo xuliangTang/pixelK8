@@ -53,3 +53,8 @@ type DeleteServiceUri struct {
 	Namespace string `uri:"ns" binding:"required"`
 	Name      string `uri:"service" binding:"required"`
 }
+
+type PodContainerTerminalUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"pod" binding:"required"`
+}

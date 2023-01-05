@@ -4,6 +4,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"log"
+	"pixelk8/src/properties"
 )
 
 // K8sCfg @configuration
@@ -20,7 +21,7 @@ func (*K8sCfg) InitClient() *kubernetes.Clientset {
 		BearerToken: "",
 	}*/
 
-	config, err := clientcmd.BuildConfigFromFlags("", "kubeconfig")
+	config, err := clientcmd.BuildConfigFromFlags("", properties.App.K8s.KubeConfigPath)
 	if err != nil {
 		log.Fatal(err)
 	}
