@@ -26,20 +26,22 @@ func (this *IngressCtl) ingress(ctx *gin.Context) athena.Collection {
 	return this.IngSvc.Paging(page, ingList)
 }
 
-func (this *IngressCtl) createIngress(ctx *gin.Context) (athena.HttpCode, any) {
+func (this *IngressCtl) createIngress(ctx *gin.Context) any {
 	req := &requests.CreateIngress{}
 	athena.Error(ctx.BindJSON(req))
 	athena.Error(this.IngSvc.Create(req))
 
-	return http.StatusCreated, req
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return req
 }
 
-func (this *IngressCtl) deleteIngress(ctx *gin.Context) athena.HttpCode {
+func (this *IngressCtl) deleteIngress(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.DeleteIngressUri{}
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(this.IngSvc.Delete(uri))
 
-	return http.StatusNoContent
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
 }
 
 func (this *IngressCtl) Build(athena *athena.Athena) {

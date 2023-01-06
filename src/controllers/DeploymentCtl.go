@@ -32,15 +32,17 @@ func (this *DeploymentCtl) deploymentPods(ctx *gin.Context) any {
 	var uri requests.DeploymentUri
 	athena.Error(ctx.BindUri(&uri))
 	podList := this.PodService.ListByDeployment(ns, uri.Deployment)
+
 	return podList
 }
 
-func (this *DeploymentCtl) deleteDeployment(ctx *gin.Context) athena.HttpCode {
+func (this *DeploymentCtl) deleteDeployment(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.DeleteDeploymentUri{}
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(this.DeploymentService.Delete(uri))
 
-	return http.StatusNoContent
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
 }
 
 func (this *DeploymentCtl) Build(athena *athena.Athena) {

@@ -23,17 +23,18 @@ func NewWsCtl() *WsCtl {
 	return &WsCtl{}
 }
 
-func (*WsCtl) connect(ctx *gin.Context) athena.HttpCode {
+func (*WsCtl) connect(ctx *gin.Context) (v athena.Void) {
 	client, err := ws.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		log.Println(err)
 	}
 
 	ws.ClientMap.Store(client)
-	return http.StatusOK
+
+	return
 }
 
-func (this *WsCtl) podContainerTerminal(ctx *gin.Context) athena.HttpCode {
+func (this *WsCtl) podContainerTerminal(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.PodContainerTerminalUri{}
 	athena.Error(ctx.BindUri(uri))
 
@@ -42,13 +43,15 @@ func (this *WsCtl) podContainerTerminal(ctx *gin.Context) athena.HttpCode {
 
 	wsClient, err := ws.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		return http.StatusBadRequest
+		ctx.Set(athena.CtxHttpStatusCode, http.StatusBadRequest)
+		return
 	}
 
 	shellClient := ws.NewWsShellClient(wsClient)
 	exec, err := this.PodService.HandlerCommand(uri, query)
 	if err != nil {
-		return http.StatusBadRequest
+		ctx.Set(athena.CtxHttpStatusCode, http.StatusBadRequest)
+		return
 	}
 
 	err = exec.StreamWithContext(ctx, remotecommand.StreamOptions{
@@ -58,27 +61,30 @@ func (this *WsCtl) podContainerTerminal(ctx *gin.Context) athena.HttpCode {
 		Tty:    true,
 	})
 
-	return http.StatusOK
+	return
 }
 
-func (this *WsCtl) nodeTerminal(ctx *gin.Context) athena.HttpCode {
+func (this *WsCtl) nodeTerminal(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.NodeTerminalUri{}
 	athena.Error(ctx.BindUri(uri))
 
 	wsClient, err := ws.Upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		return http.StatusBadRequest
+		ctx.Set(athena.CtxHttpStatusCode, http.StatusBadRequest)
+		return
 	}
 
 	nodeInfo, ok := properties.App.K8s.Nodes[uri.Name]
 	if !ok {
-		return http.StatusBadRequest
+		ctx.Set(athena.CtxHttpStatusCode, http.StatusBadRequest)
+		return
 	}
 
 	shellClient := ws.NewWsShellClient(wsClient)
 	session, err := this.NodeService.SSHConnect(nodeInfo.Username, nodeInfo.Password, nodeInfo.Host, nodeInfo.Port)
 	if err != nil {
-		return http.StatusBadRequest
+		ctx.Set(athena.CtxHttpStatusCode, http.StatusBadRequest)
+		return
 	}
 
 	defer session.Close()
@@ -94,15 +100,17 @@ func (this *WsCtl) nodeTerminal(ctx *gin.Context) athena.HttpCode {
 
 	err = session.RequestPty("xterm-256color", 300, 500, nodeShellModes)
 	if err != nil {
-		return http.StatusBadRequest
+		ctx.Set(athena.CtxHttpStatusCode, http.StatusBadRequest)
+		return
 	}
 
 	err = session.Run("sh")
 	if err != nil {
-		return http.StatusBadRequest
+		ctx.Set(athena.CtxHttpStatusCode, http.StatusBadRequest)
+		return
 	}
 
-	return http.StatusOK
+	return
 }
 
 func (this *WsCtl) Build(athena *athena.Athena) {

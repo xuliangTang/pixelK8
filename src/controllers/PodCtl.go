@@ -36,7 +36,7 @@ func (this *PodCtl) podAllContainers(ctx *gin.Context) any {
 	return this.PodService.GetPodContainers(uri)
 }
 
-func (this *PodCtl) podContainerLogs(ctx *gin.Context) athena.HttpCode {
+func (this *PodCtl) podContainerLogs(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.PodContainersLogsUri{}
 	query := &requests.PodContainerLogsQuery{}
 	athena.Error(ctx.BindUri(uri))
@@ -62,15 +62,16 @@ func (this *PodCtl) podContainerLogs(ctx *gin.Context) athena.HttpCode {
 		ctx.Writer.(http.Flusher).Flush()
 	}
 
-	return http.StatusOK
+	return
 }
 
-func (this *PodCtl) deletePod(ctx *gin.Context) athena.HttpCode {
+func (this *PodCtl) deletePod(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.DeletePodUri{}
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(this.PodService.Delete(uri))
 
-	return http.StatusNoContent
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
 }
 
 func (this *PodCtl) Build(athena *athena.Athena) {

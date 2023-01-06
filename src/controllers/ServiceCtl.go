@@ -31,12 +31,13 @@ func (this *ServiceCtl) services(ctx *gin.Context) athena.Collection {
 	return this.SvcService.Paging(page, svcList)
 }
 
-func (this *ServiceCtl) deleteService(ctx *gin.Context) athena.HttpCode {
+func (this *ServiceCtl) deleteService(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.DeleteServiceUri{}
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(this.SvcService.Delete(uri))
 
-	return http.StatusNoContent
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
 }
 
 func (this *ServiceCtl) Build(athena *athena.Athena) {

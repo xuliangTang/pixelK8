@@ -26,12 +26,13 @@ func (this *ConfigmapCtl) configmaps(ctx *gin.Context) athena.Collection {
 	return this.CmSvc.Paging(page, cmList)
 }
 
-func (this *ConfigmapCtl) createConfigmap(ctx *gin.Context) (athena.HttpCode, any) {
+func (this *ConfigmapCtl) createConfigmap(ctx *gin.Context) any {
 	req := &requests.CreateConfigmap{}
 	athena.Error(ctx.BindJSON(req))
 	athena.Error(this.CmSvc.Create(req))
 
-	return http.StatusCreated, req
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return req
 }
 
 func (this *ConfigmapCtl) showConfigmap(ctx *gin.Context) any {
@@ -41,12 +42,13 @@ func (this *ConfigmapCtl) showConfigmap(ctx *gin.Context) any {
 	return this.CmSvc.Show(uri)
 }
 
-func (this *ConfigmapCtl) deleteConfigmap(ctx *gin.Context) athena.HttpCode {
+func (this *ConfigmapCtl) deleteConfigmap(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.DeleteConfigmapUri{}
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(this.CmSvc.Delete(uri))
 
-	return http.StatusNoContent
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
 }
 
 func (this *ConfigmapCtl) Build(athena *athena.Athena) {

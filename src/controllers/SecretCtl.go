@@ -26,12 +26,13 @@ func (this *SecretCtl) secrets(ctx *gin.Context) athena.Collection {
 	return this.SecretService.Paging(page, secretList)
 }
 
-func (this *SecretCtl) createSecret(ctx *gin.Context) (athena.HttpCode, any) {
+func (this *SecretCtl) createSecret(ctx *gin.Context) any {
 	req := &requests.CreateSecret{}
 	athena.Error(ctx.BindJSON(req))
 	athena.Error(this.SecretService.Create(req))
 
-	return http.StatusCreated, req
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return req
 }
 
 func (this *SecretCtl) showSecret(ctx *gin.Context) any {
@@ -41,12 +42,13 @@ func (this *SecretCtl) showSecret(ctx *gin.Context) any {
 	return this.SecretService.Show(uri)
 }
 
-func (this *SecretCtl) deleteSecret(ctx *gin.Context) athena.HttpCode {
+func (this *SecretCtl) deleteSecret(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.DeleteSecretUri{}
 	athena.Error(ctx.BindUri(uri))
 	athena.Error(this.SecretService.Delete(uri))
 
-	return http.StatusNoContent
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
 }
 
 func (this *SecretCtl) Build(athena *athena.Athena) {
