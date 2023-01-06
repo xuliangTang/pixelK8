@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/spf13/viper"
 	"github.com/xuliangTang/athena/athena"
 	"github.com/xuliangTang/athena/athena/plugins"
 	"pixelk8/src/configurations"
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	server := athena.Ignite().
-		MappingConfig(&properties.App).
+		MappingConfig(&properties.App, viper.DecodeHook(properties.App.JsonToNodeMapHookFunc())).
 		RegisterPlugin(plugins.NewI18n()).
 		Configuration(
 			configurations.NewK8sMapCfg(),
