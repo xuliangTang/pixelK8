@@ -7,7 +7,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/nicksnyder/go-i18n/v2 v2.2.1
 	github.com/spf13/viper v1.14.0
-	github.com/xuliangTang/athena v1.0.3-beta4
+	github.com/xuliangTang/athena v1.0.3-beta5
 	k8s.io/api v0.26.0
 	k8s.io/apimachinery v0.26.0
 	k8s.io/client-go v0.26.0

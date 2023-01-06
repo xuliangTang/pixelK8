@@ -292,6 +292,8 @@ github.com/xuliangTang/athena v1.0.3-beta2 h1:J8C2YLgQzB391DNB05cGYEsjj9qJWkV2j6
 github.com/xuliangTang/athena v1.0.3-beta2/go.mod h1:uCB8Lcqmx6gUgXxh5weE71x/tXNcQlxdPlARFvmest0=
 github.com/xuliangTang/athena v1.0.3-beta4 h1:oYymEcsen+3/eM/0Bp4h1CCDQhLBh3zYMJ1pWF85ccY=
 github.com/xuliangTang/athena v1.0.3-beta4/go.mod h1:uCB8Lcqmx6gUgXxh5weE71x/tXNcQlxdPlARFvmest0=
+github.com/xuliangTang/athena v1.0.3-beta5 h1:qH/OrRM5xc8DEqS6byQ2Y40t+npkvfy0qpFlSTjZWeo=
+github.com/xuliangTang/athena v1.0.3-beta5/go.mod h1:uCB8Lcqmx6gUgXxh5weE71x/tXNcQlxdPlARFvmest0=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
