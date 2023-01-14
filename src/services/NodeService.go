@@ -8,6 +8,7 @@ import (
 	"net"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"regexp"
 )
 
 // NodeService @Service
@@ -28,6 +29,7 @@ func (this *NodeService) List() (ret []*dto.NodeList) {
 		ret[i] = &dto.NodeList{
 			Name:      node.Name,
 			Ip:        node.Status.Addresses[0].Address,
+			Labels:    this.filterLabels(node.Labels),
 			CreatedAt: node.CreationTimestamp.Format(athena.DateTimeFormat),
 		}
 	}
@@ -84,4 +86,16 @@ func (*NodeService) SSHConnect(user, password, host string, port int) (*ssh.Sess
 		return nil, err
 	}
 	return session, nil
+}
+
+// 过滤域名形式的labels
+func (*NodeService) filterLabels(labels map[string]string) (ret []string) {
+	const expr = "[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\\.?"
+	ret = make([]string, 0)
+	for k, v := range labels {
+		if !regexp.MustCompile(expr).MatchString(k) {
+			ret = append(ret, fmt.Sprintf("%s=%s", k, v))
+		}
+	}
+	return
 }
