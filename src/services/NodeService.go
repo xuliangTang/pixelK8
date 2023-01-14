@@ -1,19 +1,27 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
 	"golang.org/x/crypto/ssh"
+	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/metrics/pkg/client/clientset/versioned"
 	"net"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
 	"regexp"
 )
 
+const hostPattern = "[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\\.?"
+
 // NodeService @Service
 type NodeService struct {
-	NodeMap *maps.NodeMap `inject:"-"`
+	NodeMap       *maps.NodeMap        `inject:"-"`
+	PodMap        *maps.PodMap         `inject:"-"`
+	MetricsClient *versioned.Clientset `inject:"-"`
 }
 
 func NewNodeService() *NodeService {
@@ -27,10 +35,17 @@ func (this *NodeService) List() (ret []*dto.NodeList) {
 	ret = make([]*dto.NodeList, len(nodeList))
 	for i, node := range nodeList {
 		ret[i] = &dto.NodeList{
-			Name:      node.Name,
-			Ip:        node.Status.Addresses[0].Address,
-			Labels:    this.filterLabels(node.Labels),
-			CreatedAt: node.CreationTimestamp.Format(athena.DateTimeFormat),
+			Name:   node.Name,
+			Ip:     node.Status.Addresses[0].Address,
+			Labels: this.filterLabels(node.Labels),
+			Taints: this.filterTaints(node.Spec.Taints),
+			Capacity: &dto.NodeCapacity{
+				Cpu:    node.Status.Capacity.Cpu().Value(),
+				Memory: node.Status.Capacity.Memory().Value(),
+				Pods:   node.Status.Capacity.Pods().Value(),
+			},
+			CapacityUsage: this.getMetricsCapacityUsageByNodeName(node.Name),
+			CreatedAt:     node.CreationTimestamp.Format(athena.DateTimeFormat),
 		}
 	}
 
@@ -90,12 +105,35 @@ func (*NodeService) SSHConnect(user, password, host string, port int) (*ssh.Sess
 
 // 过滤域名形式的labels
 func (*NodeService) filterLabels(labels map[string]string) (ret []string) {
-	const expr = "[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\\.?"
 	ret = make([]string, 0)
 	for k, v := range labels {
-		if !regexp.MustCompile(expr).MatchString(k) {
+		if !regexp.MustCompile(hostPattern).MatchString(k) {
 			ret = append(ret, fmt.Sprintf("%s=%s", k, v))
 		}
 	}
 	return
+}
+
+// 过滤域名形式的taints
+func (*NodeService) filterTaints(taints []coreV1.Taint) (ret []string) {
+	ret = make([]string, 0)
+	for _, taint := range taints {
+		if !regexp.MustCompile(hostPattern).MatchString(taint.Key) {
+			ret = append(ret, fmt.Sprintf("%s=%s:%s", taint.Key, taint.Value, taint.Effect))
+		}
+	}
+	return
+}
+
+// 通过metrics获取节点已使用资源
+func (this *NodeService) getMetricsCapacityUsageByNodeName(nodeName string) *dto.NodeCapacityUsage {
+	nodeMetrics, err := this.MetricsClient.MetricsV1beta1().NodeMetricses().Get(context.Background(), nodeName, metaV1.GetOptions{})
+	athena.Error(err)
+
+	pods := this.PodMap.CountByNodeName(nodeName)
+	return &dto.NodeCapacityUsage{
+		Cpu:    nodeMetrics.Usage.Cpu().MilliValue(),
+		Memory: nodeMetrics.Usage.Memory().MilliValue(),
+		Pods:   pods,
+	}
 }

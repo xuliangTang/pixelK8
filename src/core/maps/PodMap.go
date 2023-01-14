@@ -95,3 +95,18 @@ func (this *PodMap) Find(ns string, name string) *coreV1.Pod {
 	}
 	return &coreV1.Pod{}
 }
+
+// CountByNodeName 根据节点名统计pod数量
+func (this *PodMap) CountByNodeName(nodeName string) (count int64) {
+	this.Data.Range(func(key, value any) bool {
+		pods := value.([]*coreV1.Pod)
+		for _, pod := range pods {
+			if pod.Spec.NodeName == nodeName {
+				count++
+			}
+		}
+		return true
+	})
+
+	return
+}
