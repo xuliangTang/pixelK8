@@ -1,5 +1,7 @@
 package requests
 
+import coreV1 "k8s.io/api/core/v1"
+
 // CreateIngress 创建ingress对象
 type CreateIngress struct {
 	Name        string          `json:"name" binding:"required"`
@@ -36,4 +38,10 @@ type CreateConfigmap struct {
 	Namespace string            `json:"namespace" binding:"required"`
 	Data      map[string]string `json:"data" binding:"required"`
 	IsEdit    *bool             `json:"is_edit"`
+}
+
+// UpdateNode 更新Node
+type UpdateNode struct {
+	Labels map[string]string `json:"labels" binding:"required"`
+	Taints []coreV1.Taint    `json:"taints" binding:"required"`
 }

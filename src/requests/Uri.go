@@ -62,3 +62,7 @@ type PodContainerTerminalUri struct {
 type NodeTerminalUri struct {
 	Name string `uri:"node" binding:"required"`
 }
+
+type ShowNodeUri struct {
+	Name string `uri:"node" binding:"required"`
+}

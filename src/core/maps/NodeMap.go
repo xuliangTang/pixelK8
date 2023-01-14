@@ -25,6 +25,15 @@ func (this *NodeMap) Delete(node *coreV1.Node) {
 	this.data.Delete(node.Name)
 }
 
+// Find 查找node
+func (this *NodeMap) Find(nodeName string) *coreV1.Node {
+	if node, ok := this.data.Load(nodeName); ok {
+		return node.(*coreV1.Node)
+	}
+
+	return &coreV1.Node{}
+}
+
 // List 获取node列表
 func (this *NodeMap) List() []*coreV1.Node {
 	ret := make([]*coreV1.Node, 0)

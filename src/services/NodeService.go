@@ -8,10 +8,12 @@ import (
 	"golang.org/x/crypto/ssh"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/metrics/pkg/client/clientset/versioned"
 	"net"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/requests"
 	"regexp"
 )
 
@@ -19,9 +21,10 @@ const hostPattern = "[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,
 
 // NodeService @Service
 type NodeService struct {
-	NodeMap       *maps.NodeMap        `inject:"-"`
-	PodMap        *maps.PodMap         `inject:"-"`
-	MetricsClient *versioned.Clientset `inject:"-"`
+	NodeMap       *maps.NodeMap         `inject:"-"`
+	PodMap        *maps.PodMap          `inject:"-"`
+	MetricsClient *versioned.Clientset  `inject:"-"`
+	K8sClient     *kubernetes.Clientset `inject:"-"`
 }
 
 func NewNodeService() *NodeService {
@@ -66,6 +69,29 @@ func (this *NodeService) Paging(page *athena.Page, nodeList []*dto.NodeList) ath
 	start, end := page.SlicePage(iNodeList)
 	collection := athena.NewCollection(nodeList[start:end], page)
 	return *collection
+}
+
+// Show 获取node详情
+func (this *NodeService) Show(uri *requests.ShowNodeUri) *dto.NodeShow {
+	node := this.NodeMap.Find(uri.Name)
+	return &dto.NodeShow{
+		Name:      node.Name,
+		Ip:        node.Status.Addresses[0].Address,
+		Labels:    node.Labels,
+		Taints:    node.Spec.Taints,
+		Info:      node.Status.NodeInfo,
+		CreatedAt: node.CreationTimestamp.Format(athena.DateTimeFormat),
+	}
+}
+
+// Update 更新node
+func (this *NodeService) Update(uri *requests.ShowNodeUri, req *requests.UpdateNode) error {
+	node := this.NodeMap.Find(uri.Name)
+	node.Labels = req.Labels
+	node.Spec.Taints = req.Taints
+
+	_, err := this.K8sClient.CoreV1().Nodes().Update(context.Background(), node, metaV1.UpdateOptions{})
+	return err
 }
 
 // SSHConnect 获取SSH连接
