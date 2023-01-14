@@ -1,6 +1,9 @@
 package configurations
 
-import "pixelk8/src/services"
+import (
+	"pixelk8/pkg/rbac"
+	"pixelk8/src/services"
+)
 
 // ServiceCfg @configuration
 type ServiceCfg struct{}
@@ -43,4 +46,8 @@ func (*ServiceCfg) InitConfigmapService() *services.ConfigmapService {
 
 func (*ServiceCfg) InitNodeService() *services.NodeService {
 	return services.NewNodeService()
+}
+
+func (*ServiceCfg) InitRoleService() *rbac.RoleService {
+	return rbac.NewRoleService()
 }

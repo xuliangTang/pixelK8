@@ -4,6 +4,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	"pixelk8/pkg/rbac"
 	"pixelk8/src/core/informerHandlers"
 )
 
@@ -20,6 +21,7 @@ type K8sInformerStart struct {
 	SecretHandler     *informerHandlers.SecretHandler     `inject:"-"`
 	ConfigmapHandler  *informerHandlers.ConfigmapHandler  `inject:"-"`
 	NodeHandler       *informerHandlers.NodeHandler       `inject:"-"`
+	RoleHandler       *rbac.RoleHandler                   `inject:"-"`
 }
 
 func NewK8sInformerStart() *K8sInformerStart {
@@ -58,6 +60,9 @@ func (this *K8sInformerStart) InitInformer() informers.SharedInformerFactory {
 
 	nodeInformer := informerFactory.Core().V1().Nodes()
 	nodeInformer.Informer().AddEventHandler(this.NodeHandler)
+
+	roleInformer := informerFactory.Rbac().V1().Roles()
+	roleInformer.Informer().AddEventHandler(this.RoleHandler)
 
 	informerFactory.Start(wait.NeverStop)
 

@@ -1,6 +1,7 @@
 package configurations
 
 import (
+	"pixelk8/pkg/rbac"
 	"pixelk8/src/core/informerHandlers"
 )
 
@@ -49,4 +50,8 @@ func (*K8sInformerHandlerCfg) InitConfigmapHandler() *informerHandlers.Configmap
 
 func (*K8sInformerHandlerCfg) InitNodeHandler() *informerHandlers.NodeHandler {
 	return &informerHandlers.NodeHandler{}
+}
+
+func (*K8sInformerHandlerCfg) InitRoleHandler() *rbac.RoleHandler {
+	return &rbac.RoleHandler{}
 }

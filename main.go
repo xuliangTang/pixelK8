@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/xuliangTang/athena/athena"
 	"github.com/xuliangTang/athena/athena/plugins"
+	"pixelk8/pkg/rbac"
 	"pixelk8/src/configurations"
 	"pixelk8/src/controllers"
 	"pixelk8/src/properties"
@@ -29,7 +30,8 @@ func main() {
 			controllers.NewServiceCtl(),
 			controllers.NewSecretCtl(),
 			controllers.NewConfigmapCtl(),
-			controllers.NewNodeCtl())
+			controllers.NewNodeCtl(),
+			rbac.NewRBACCtl())
 
 	/*server.GET("/c/*filepath", func(context *gin.Context) {
 		http.FileServer(FS(false)).ServeHTTP(context.Writer, context.Request)
