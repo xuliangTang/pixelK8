@@ -26,6 +26,13 @@ func (this *RBACCtl) roles(ctx *gin.Context) athena.Collection {
 	return this.RoleSvc.Paging(page, roleList)
 }
 
+func (this *RBACCtl) rolesAll(ctx *gin.Context) any {
+	ns := ctx.DefaultQuery("ns", properties.App.K8s.DefaultNs)
+	roleList := this.RoleSvc.ListByNs(ns)
+
+	return roleList
+}
+
 func (this *RBACCtl) createRole(ctx *gin.Context) any {
 	role := &rbacV1.Role{}
 	athena.Error(ctx.BindJSON(role))
@@ -55,13 +62,40 @@ func (this *RBACCtl) roleBindings(ctx *gin.Context) athena.Collection {
 	return this.RoleBindingSvc.Paging(page, roleBindingList)
 }
 
+func (this *RBACCtl) createRoleBinding(ctx *gin.Context) any {
+	roleBinding := &rbacV1.RoleBinding{}
+	athena.Error(ctx.BindJSON(roleBinding))
+	athena.Error(this.RoleBindingSvc.Create(roleBinding))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return roleBinding
+}
+
+func (this *RBACCtl) deleteRoleBinding(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		Namespace       string `uri:"ns" binding:"required"`
+		RoleBindingName string `uri:"roleBinding" binding:"required"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.RoleBindingSvc.Delete(uri.Namespace, uri.RoleBindingName))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
+	// 获取全部role
+	athena.Handle("GET", "/roles/all", this.rolesAll)
 	// 创建role
 	athena.Handle("POST", "/role", this.createRole)
 	// 删除role
 	athena.Handle("DELETE", "/role/:ns/:role", this.deleteRole)
 	// roleBinding列表
 	athena.Handle("GET", "/roleBindings", this.roleBindings)
+	// 创建roleBinding
+	athena.Handle("POST", "/roleBinding", this.createRoleBinding)
+	// 删除roleBinding
+	athena.Handle("DELETE", "/roleBinding/:ns/:roleBinding", this.deleteRoleBinding)
 }
