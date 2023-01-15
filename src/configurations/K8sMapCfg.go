@@ -55,3 +55,7 @@ func (*K8sMapCfg) InitNodeMap() *maps.NodeMap {
 func (*K8sMapCfg) InitRoleMap() *rbac.RoleMap {
 	return &rbac.RoleMap{}
 }
+
+func (*K8sMapCfg) InitRoleBindingMap() *rbac.RoleBindingMap {
+	return &rbac.RoleBindingMap{}
+}

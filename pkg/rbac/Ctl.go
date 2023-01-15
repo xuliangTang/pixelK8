@@ -10,7 +10,8 @@ import (
 
 // RBACCtl @Controller
 type RBACCtl struct {
-	RoleSvc *RoleService `inject:"-"`
+	RoleSvc        *RoleService        `inject:"-"`
+	RoleBindingSvc *RoleBindingService `inject:"-"`
 }
 
 func NewRBACCtl() *RBACCtl {
@@ -46,6 +47,14 @@ func (this *RBACCtl) deleteRole(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *RBACCtl) roleBindings(ctx *gin.Context) athena.Collection {
+	ns := ctx.DefaultQuery("ns", properties.App.K8s.DefaultNs)
+	page := athena.NewPageWithCtx(ctx)
+	roleBindingList := this.RoleBindingSvc.ListByNs(ns)
+
+	return this.RoleBindingSvc.Paging(page, roleBindingList)
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -53,4 +62,6 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/role", this.createRole)
 	// 删除role
 	athena.Handle("DELETE", "/role/:ns/:role", this.deleteRole)
+	// roleBinding列表
+	athena.Handle("GET", "/roleBindings", this.roleBindings)
 }

@@ -55,3 +55,7 @@ func (*K8sInformerHandlerCfg) InitNodeHandler() *informerHandlers.NodeHandler {
 func (*K8sInformerHandlerCfg) InitRoleHandler() *rbac.RoleHandler {
 	return &rbac.RoleHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitRoleBindingHandler() *rbac.RoleBindingHandler {
+	return &rbac.RoleBindingHandler{}
+}
