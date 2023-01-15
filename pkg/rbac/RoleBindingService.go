@@ -64,6 +64,34 @@ func (this *RoleBindingService) Create(roleBinding *rbacV1.RoleBinding) error {
 	return err
 }
 
+// AddUser 向roleBinding添加user
+func (this *RoleBindingService) AddUser(ns, roleBindingName string, subject *rbacV1.Subject) error {
+	roleBinding := *this.RoleBindingMap.Find(ns, roleBindingName) // 取指针的值拷贝，否则会修改原对象
+	roleBinding.Subjects = append(roleBinding.Subjects, *subject)
+
+	_, err := this.K8sClient.RbacV1().RoleBindings(ns).
+		Update(context.Background(), &roleBinding, metaV1.UpdateOptions{})
+
+	return err
+}
+
+// RemoveUser 从roleBinding移除user
+func (this *RoleBindingService) RemoveUser(ns, roleBindingName string, subject *rbacV1.Subject) error {
+	roleBinding := *this.RoleBindingMap.Find(ns, roleBindingName)
+
+	for i, sub := range roleBinding.Subjects {
+		if sub.Kind == subject.Kind && sub.Name == subject.Name {
+			roleBinding.Subjects = append(roleBinding.Subjects[:i], roleBinding.Subjects[i+1:]...)
+			break
+		}
+	}
+
+	_, err := this.K8sClient.RbacV1().RoleBindings(ns).
+		Update(context.Background(), &roleBinding, metaV1.UpdateOptions{})
+
+	return err
+}
+
 // Delete 删除roleBinding
 func (this *RoleBindingService) Delete(ns, roleBindingName string) error {
 	return this.K8sClient.RbacV1().RoleBindings(ns).

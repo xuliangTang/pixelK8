@@ -83,6 +83,34 @@ func (this *RBACCtl) deleteRoleBinding(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *RBACCtl) addUserToRoleBinding(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		Namespace       string `uri:"ns" binding:"required"`
+		RoleBindingName string `uri:"roleBinding" binding:"required"`
+	}{}
+	subject := &rbacV1.Subject{}
+
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(ctx.BindJSON(subject))
+	athena.Error(this.RoleBindingSvc.AddUser(uri.Namespace, uri.RoleBindingName, subject))
+
+	return
+}
+
+func (this *RBACCtl) removeUserFromRoleBinding(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		Namespace       string `uri:"ns" binding:"required"`
+		RoleBindingName string `uri:"roleBinding" binding:"required"`
+	}{}
+	subject := &rbacV1.Subject{}
+
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(ctx.BindJSON(subject))
+	athena.Error(this.RoleBindingSvc.RemoveUser(uri.Namespace, uri.RoleBindingName, subject))
+
+	return
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -98,4 +126,8 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/roleBinding", this.createRoleBinding)
 	// 删除roleBinding
 	athena.Handle("DELETE", "/roleBinding/:ns/:roleBinding", this.deleteRoleBinding)
+	// roleBinding增加user
+	athena.Handle("PATCH", "/roleBinding/:ns/:roleBinding/user", this.addUserToRoleBinding)
+	// roleBinding移除user
+	athena.Handle("PATCH", "/roleBinding/:ns/:roleBinding/user/remove", this.removeUserFromRoleBinding)
 }

@@ -62,6 +62,19 @@ func (this *RoleBindingMap) ListByNs(ns string) []*rbacV1.RoleBinding {
 	return []*rbacV1.RoleBinding{}
 }
 
+// Find 查找roleBinding
+func (this *RoleBindingMap) Find(ns, roleBindingName string) *rbacV1.RoleBinding {
+	if roleBindingList, ok := this.data.Load(ns); ok {
+		for _, roleBinding := range roleBindingList.([]*rbacV1.RoleBinding) {
+			if roleBinding.Name == roleBindingName {
+				return roleBinding
+			}
+		}
+	}
+
+	return &rbacV1.RoleBinding{}
+}
+
 // 排序roleBinding 按创建时间
 type rbacV1RoleBindings []*rbacV1.RoleBinding
 
