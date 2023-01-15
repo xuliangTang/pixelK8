@@ -1,13 +1,18 @@
 package rbac
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	rbacV1 "k8s.io/api/rbac/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 // RoleService @Service
 type RoleService struct {
-	RoleMap *RoleMap `inject:"-"`
+	RoleMap   *RoleMap              `inject:"-"`
+	K8sClient *kubernetes.Clientset `inject:"-"`
 }
 
 func NewRoleService() *RoleService {
@@ -43,4 +48,21 @@ func (this *RoleService) Paging(page *athena.Page, roleList []RoleListModel) ath
 	start, end := page.SlicePage(iRoleList)
 	collection := athena.NewCollection(roleList[start:end], page)
 	return *collection
+}
+
+// Create 创建role
+func (this *RoleService) Create(role *rbacV1.Role) error {
+	role.Kind = "Role"
+	role.APIVersion = "rbac.authorization.k8s.io/v1"
+
+	_, err := this.K8sClient.RbacV1().Roles(role.Namespace).
+		Create(context.Background(), role, metaV1.CreateOptions{})
+
+	return err
+}
+
+// Delete 删除role
+func (this *RoleService) Delete(ns string, roleName string) error {
+	return this.K8sClient.RbacV1().Roles(ns).
+		Delete(context.Background(), roleName, metaV1.DeleteOptions{})
 }
