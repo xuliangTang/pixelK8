@@ -66,3 +66,25 @@ func (this *RoleService) Delete(ns string, roleName string) error {
 	return this.K8sClient.RbacV1().Roles(ns).
 		Delete(context.Background(), roleName, metaV1.DeleteOptions{})
 }
+
+// Show 查看role
+func (this *RoleService) Show(ns, roleName string) RoleDetailModel {
+	role := this.RoleMap.Find(ns, roleName)
+
+	return RoleDetailModel{
+		Name:      role.Name,
+		Namespace: role.Namespace,
+		Rules:     role.Rules,
+		CreatedAt: role.CreationTimestamp.Format(athena.DateTimeFormat),
+	}
+}
+
+// Update 编辑role
+func (this *RoleService) Update(ns, roleName string, rules []rbacV1.PolicyRule) error {
+	role := this.RoleMap.Find(ns, roleName)
+	role.Rules = rules
+	_, err := this.K8sClient.RbacV1().Roles(ns).
+		Update(context.Background(), role, metaV1.UpdateOptions{})
+
+	return err
+}

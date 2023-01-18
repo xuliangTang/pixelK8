@@ -42,6 +42,32 @@ func (this *RBACCtl) createRole(ctx *gin.Context) any {
 	return role
 }
 
+func (this *RBACCtl) showRole(ctx *gin.Context) any {
+	uri := &struct {
+		Namespace string `uri:"ns" binding:"required"`
+		RoleName  string `uri:"role" binding:"required"`
+	}{}
+
+	athena.Error(ctx.BindUri(uri))
+
+	return this.RoleSvc.Show(uri.Namespace, uri.RoleName)
+}
+
+func (this *RBACCtl) updateRole(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		Namespace string `uri:"ns" binding:"required"`
+		RoleName  string `uri:"role" binding:"required"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+
+	role := &rbacV1.Role{}
+	athena.Error(ctx.BindJSON(role))
+
+	athena.Error(this.RoleSvc.Update(uri.Namespace, uri.RoleName, role.Rules))
+
+	return
+}
+
 func (this *RBACCtl) deleteRole(ctx *gin.Context) (v athena.Void) {
 	uri := &struct {
 		Namespace string `uri:"ns" binding:"required"`
@@ -118,6 +144,10 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("GET", "/roles/all", this.rolesAll)
 	// 创建role
 	athena.Handle("POST", "/role", this.createRole)
+	// 查看role
+	athena.Handle("GET", "/role/:ns/:role", this.showRole)
+	// 编辑role
+	athena.Handle("PUT", "/role/:ns/:role", this.updateRole)
 	// 删除role
 	athena.Handle("DELETE", "/role/:ns/:role", this.deleteRole)
 	// roleBinding列表

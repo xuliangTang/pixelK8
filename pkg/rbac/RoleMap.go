@@ -62,6 +62,19 @@ func (this *RoleMap) ListByNs(ns string) []*rbacV1.Role {
 	return []*rbacV1.Role{}
 }
 
+// Find 查找
+func (this *RoleMap) Find(ns, roleName string) *rbacV1.Role {
+	if roleList, ok := this.data.Load(ns); ok {
+		for _, role := range roleList.([]*rbacV1.Role) {
+			if role.Name == roleName {
+				return role
+			}
+		}
+	}
+
+	return &rbacV1.Role{}
+}
+
 // 排序role 按创建时间
 type rbacV1Roles []*rbacV1.Role
 

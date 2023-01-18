@@ -8,6 +8,13 @@ type RoleListModel struct {
 	CreatedAt string `json:"created_at"`
 }
 
+type RoleDetailModel struct {
+	Name      string              `json:"name"`
+	Namespace string              `json:"namespace"`
+	Rules     []rbacV1.PolicyRule `json:"rules"`
+	CreatedAt string              `json:"created_at"`
+}
+
 type RoleBindingListModel struct {
 	Name      string           `json:"name"`
 	Namespace string           `json:"namespace"`
