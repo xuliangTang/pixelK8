@@ -10,8 +10,9 @@ import (
 
 // RBACCtl @Controller
 type RBACCtl struct {
-	RoleSvc        *RoleService        `inject:"-"`
-	RoleBindingSvc *RoleBindingService `inject:"-"`
+	RoleSvc           *RoleService           `inject:"-"`
+	RoleBindingSvc    *RoleBindingService    `inject:"-"`
+	ServiceAccountSvc *ServiceAccountService `inject:"-"`
 }
 
 func NewRBACCtl() *RBACCtl {
@@ -137,6 +138,14 @@ func (this *RBACCtl) removeUserFromRoleBinding(ctx *gin.Context) (v athena.Void)
 	return
 }
 
+func (this *RBACCtl) serviceAccounts(ctx *gin.Context) athena.Collection {
+	ns := ctx.DefaultQuery("ns", properties.App.K8s.DefaultNs)
+	page := athena.NewPageWithCtx(ctx)
+	saList := this.ServiceAccountSvc.ListByNs(ns)
+
+	return this.ServiceAccountSvc.Paging(page, saList)
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -160,4 +169,6 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("PATCH", "/roleBinding/:ns/:roleBinding/user", this.addUserToRoleBinding)
 	// roleBinding移除user
 	athena.Handle("PATCH", "/roleBinding/:ns/:roleBinding/user/remove", this.removeUserFromRoleBinding)
+	// serviceAccount列表
+	athena.Handle("GET", "/serviceAccounts", this.serviceAccounts)
 }

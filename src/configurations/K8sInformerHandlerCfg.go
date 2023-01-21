@@ -59,3 +59,7 @@ func (*K8sInformerHandlerCfg) InitRoleHandler() *rbac.RoleHandler {
 func (*K8sInformerHandlerCfg) InitRoleBindingHandler() *rbac.RoleBindingHandler {
 	return &rbac.RoleBindingHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitServiceAccountHandler() *rbac.ServiceAccountHandler {
+	return &rbac.ServiceAccountHandler{}
+}

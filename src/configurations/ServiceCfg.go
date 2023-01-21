@@ -55,3 +55,7 @@ func (*ServiceCfg) InitRoleService() *rbac.RoleService {
 func (*ServiceCfg) InitRoleBindingService() *rbac.RoleBindingService {
 	return rbac.NewRoleBindingService()
 }
+
+func (*ServiceCfg) InitServiceAccountService() *rbac.ServiceAccountService {
+	return rbac.NewServiceAccountService()
+}

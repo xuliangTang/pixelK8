@@ -22,3 +22,9 @@ type RoleBindingListModel struct {
 	Subjects  []rbacV1.Subject `json:"subjects"`
 	CreatedAt string           `json:"created_at"`
 }
+
+type ServiceAccountListModel struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	CreatedAt string `json:"created_at"`
+}

@@ -10,19 +10,20 @@ import (
 
 // K8sInformerStart @configuration
 type K8sInformerStart struct {
-	K8sClient          *kubernetes.Clientset               `inject:"-"`
-	DeploymentHandler  *informerHandlers.DeploymentHandler `inject:"-"`
-	ReplicaSetHandler  *informerHandlers.ReplicaSetHandler `inject:"-"`
-	PodHandler         *informerHandlers.PodHandler        `inject:"-"`
-	EventHandler       *informerHandlers.EventHandler      `inject:"-"`
-	NamespaceHandler   *informerHandlers.NamespaceHandler  `inject:"-"`
-	IngressHandler     *informerHandlers.IngressHandler    `inject:"-"`
-	ServiceHandler     *informerHandlers.ServiceHandler    `inject:"-"`
-	SecretHandler      *informerHandlers.SecretHandler     `inject:"-"`
-	ConfigmapHandler   *informerHandlers.ConfigmapHandler  `inject:"-"`
-	NodeHandler        *informerHandlers.NodeHandler       `inject:"-"`
-	RoleHandler        *rbac.RoleHandler                   `inject:"-"`
-	RoleBindingHandler *rbac.RoleBindingHandler            `inject:"-"`
+	K8sClient             *kubernetes.Clientset               `inject:"-"`
+	DeploymentHandler     *informerHandlers.DeploymentHandler `inject:"-"`
+	ReplicaSetHandler     *informerHandlers.ReplicaSetHandler `inject:"-"`
+	PodHandler            *informerHandlers.PodHandler        `inject:"-"`
+	EventHandler          *informerHandlers.EventHandler      `inject:"-"`
+	NamespaceHandler      *informerHandlers.NamespaceHandler  `inject:"-"`
+	IngressHandler        *informerHandlers.IngressHandler    `inject:"-"`
+	ServiceHandler        *informerHandlers.ServiceHandler    `inject:"-"`
+	SecretHandler         *informerHandlers.SecretHandler     `inject:"-"`
+	ConfigmapHandler      *informerHandlers.ConfigmapHandler  `inject:"-"`
+	NodeHandler           *informerHandlers.NodeHandler       `inject:"-"`
+	RoleHandler           *rbac.RoleHandler                   `inject:"-"`
+	RoleBindingHandler    *rbac.RoleBindingHandler            `inject:"-"`
+	ServiceAccountHandler *rbac.ServiceAccountHandler         `inject:"-"`
 }
 
 func NewK8sInformerStart() *K8sInformerStart {
@@ -67,6 +68,9 @@ func (this *K8sInformerStart) InitInformer() informers.SharedInformerFactory {
 
 	roleBindingInformer := informerFactory.Rbac().V1().RoleBindings()
 	roleBindingInformer.Informer().AddEventHandler(this.RoleBindingHandler)
+
+	serviceAccountInformer := informerFactory.Core().V1().ServiceAccounts()
+	serviceAccountInformer.Informer().AddEventHandler(this.ServiceAccountHandler)
 
 	informerFactory.Start(wait.NeverStop)
 
