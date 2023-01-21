@@ -39,7 +39,7 @@ func (this *RoleService) ListByNs(ns string) (ret []RoleListModel) {
 func (this *RoleService) Paging(page *athena.Page, roleList []RoleListModel) athena.Collection {
 	count := len(roleList)
 	iRoleList := make([]any, count)
-	for i, role := range iRoleList {
+	for i, role := range roleList {
 		iRoleList[i] = role
 	}
 

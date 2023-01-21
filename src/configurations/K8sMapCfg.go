@@ -63,3 +63,7 @@ func (*K8sMapCfg) InitRoleBindingMap() *rbac.RoleBindingMap {
 func (*K8sMapCfg) InitServiceAccountMap() *rbac.ServiceAccountMap {
 	return &rbac.ServiceAccountMap{}
 }
+
+func (*K8sMapCfg) InitClusterRoleMap() *rbac.ClusterRoleMap {
+	return &rbac.ClusterRoleMap{}
+}

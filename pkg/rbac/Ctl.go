@@ -13,6 +13,7 @@ type RBACCtl struct {
 	RoleSvc           *RoleService           `inject:"-"`
 	RoleBindingSvc    *RoleBindingService    `inject:"-"`
 	ServiceAccountSvc *ServiceAccountService `inject:"-"`
+	ClusterRoleSvc    *ClusterRoleService    `inject:"-"`
 }
 
 func NewRBACCtl() *RBACCtl {
@@ -146,6 +147,13 @@ func (this *RBACCtl) serviceAccounts(ctx *gin.Context) athena.Collection {
 	return this.ServiceAccountSvc.Paging(page, saList)
 }
 
+func (this *RBACCtl) clusterRoles(ctx *gin.Context) athena.Collection {
+	page := athena.NewPageWithCtx(ctx)
+	clusterRoleList := this.ClusterRoleSvc.List()
+
+	return this.ClusterRoleSvc.Paging(page, clusterRoleList)
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -171,4 +179,6 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("PATCH", "/roleBinding/:ns/:roleBinding/user/remove", this.removeUserFromRoleBinding)
 	// serviceAccount列表
 	athena.Handle("GET", "/serviceAccounts", this.serviceAccounts)
+	// clusterRole列表
+	athena.Handle("GET", "/clusterRoles", this.clusterRoles)
 }

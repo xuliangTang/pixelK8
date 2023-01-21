@@ -32,3 +32,8 @@ type ServiceAccountListModel struct {
 	Secrets   []coreV1.ObjectReference `json:"secrets"`
 	CreatedAt string                   `json:"created_at"`
 }
+
+type ClusterRoleListModel struct {
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+}
