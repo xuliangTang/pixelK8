@@ -23,6 +23,7 @@ func (this *ServiceAccountService) ListByNs(ns string) (ret []ServiceAccountList
 		ret[i] = ServiceAccountListModel{
 			Name:      sa.Name,
 			Namespace: sa.Namespace,
+			Secrets:   sa.Secrets,
 			CreatedAt: sa.CreationTimestamp.Format(athena.DateTimeFormat),
 		}
 	}

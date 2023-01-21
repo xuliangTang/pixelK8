@@ -1,6 +1,9 @@
 package rbac
 
-import rbacV1 "k8s.io/api/rbac/v1"
+import (
+	coreV1 "k8s.io/api/core/v1"
+	rbacV1 "k8s.io/api/rbac/v1"
+)
 
 type RoleListModel struct {
 	Name      string `json:"name"`
@@ -24,7 +27,8 @@ type RoleBindingListModel struct {
 }
 
 type ServiceAccountListModel struct {
-	Name      string `json:"name"`
-	Namespace string `json:"namespace"`
-	CreatedAt string `json:"created_at"`
+	Name      string                   `json:"name"`
+	Namespace string                   `json:"namespace"`
+	Secrets   []coreV1.ObjectReference `json:"secrets"`
+	CreatedAt string                   `json:"created_at"`
 }
