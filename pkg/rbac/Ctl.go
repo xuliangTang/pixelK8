@@ -147,6 +147,18 @@ func (this *RBACCtl) serviceAccounts(ctx *gin.Context) athena.Collection {
 	return this.ServiceAccountSvc.Paging(page, saList)
 }
 
+func (this *RBACCtl) deleteServiceAccount(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		Namespace          string `uri:"ns" binding:"required"`
+		ServiceAccountName string `uri:"serviceAccount" binding:"required"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.ServiceAccountSvc.Delete(uri.Namespace, uri.ServiceAccountName))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *RBACCtl) clusterRoles(ctx *gin.Context) athena.Collection {
 	page := athena.NewPageWithCtx(ctx)
 	clusterRoleList := this.ClusterRoleSvc.List()
@@ -224,6 +236,8 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("PATCH", "/roleBinding/:ns/:roleBinding/user/remove", this.removeUserFromRoleBinding)
 	// serviceAccount列表
 	athena.Handle("GET", "/serviceAccounts", this.serviceAccounts)
+	// 删除serviceAccount
+	athena.Handle("DELETE", "/serviceAccount/:ns/:serviceAccount", this.deleteServiceAccount)
 	// clusterRole列表
 	athena.Handle("GET", "/clusterRoles", this.clusterRoles)
 	// 查看clusterRole

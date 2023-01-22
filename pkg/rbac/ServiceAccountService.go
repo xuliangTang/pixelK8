@@ -1,13 +1,17 @@
 package rbac
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 // ServiceAccountService @Service
 type ServiceAccountService struct {
-	SaMap *ServiceAccountMap `inject:"-"`
+	SaMap     *ServiceAccountMap    `inject:"-"`
+	K8sClient *kubernetes.Clientset `inject:"-"`
 }
 
 func NewServiceAccountService() *ServiceAccountService {
@@ -44,4 +48,9 @@ func (this *ServiceAccountService) Paging(page *athena.Page, saList []ServiceAcc
 	start, end := page.SlicePage(iSaList)
 	collection := athena.NewCollection(saList[start:end], page)
 	return *collection
+}
+
+func (this *ServiceAccountService) Delete(ns, name string) error {
+	return this.K8sClient.CoreV1().ServiceAccounts(ns).
+		Delete(context.Background(), name, metaV1.DeleteOptions{})
 }
