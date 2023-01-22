@@ -188,6 +188,17 @@ func (this *RBACCtl) updateClusterRole(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *RBACCtl) deleteClusterRole(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		ClusterRoleName string `uri:"clusterRole" binding:"required"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.ClusterRoleSvc.Delete(uri.ClusterRoleName))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -221,4 +232,6 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/clusterRole", this.createClusterRole)
 	// 编辑clusterRole
 	athena.Handle("PUT", "/clusterRole/:clusterRole", this.updateClusterRole)
+	// 删除clusterRole
+	athena.Handle("DELETE", "/clusterRole/:clusterRole", this.deleteClusterRole)
 }

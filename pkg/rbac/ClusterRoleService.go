@@ -81,3 +81,8 @@ func (this *ClusterRoleService) Update(name string, rules []rbacV1.PolicyRule) e
 
 	return err
 }
+
+func (this *ClusterRoleService) Delete(name string) error {
+	return this.K8sClient.RbacV1().ClusterRoles().
+		Delete(context.Background(), name, metaV1.DeleteOptions{})
+}
