@@ -37,3 +37,11 @@ type ClusterRoleListModel struct {
 	Name      string `json:"name"`
 	CreatedAt string `json:"created_at"`
 }
+
+type ClusterRoleDetailModel struct {
+	Name        string              `json:"name"`
+	Rules       []rbacV1.PolicyRule `json:"rules"`
+	Labels      map[string]string   `json:"labels"`
+	Annotations map[string]string   `json:"annotations"`
+	CreatedAt   string              `json:"created_at"`
+}

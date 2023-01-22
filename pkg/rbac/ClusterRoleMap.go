@@ -38,6 +38,15 @@ func (this *ClusterRoleMap) List() []*rbacV1.ClusterRole {
 	return ret
 }
 
+// Find 查找clusterRole
+func (this *ClusterRoleMap) Find(name string) *rbacV1.ClusterRole {
+	if clusterRole, ok := this.data.Load(name); ok {
+		return clusterRole.(*rbacV1.ClusterRole)
+	}
+
+	return &rbacV1.ClusterRole{}
+}
+
 // 排序clusterRole 按创建时间
 type rbacV1ClusterRoles []*rbacV1.ClusterRole
 

@@ -154,6 +154,40 @@ func (this *RBACCtl) clusterRoles(ctx *gin.Context) athena.Collection {
 	return this.ClusterRoleSvc.Paging(page, clusterRoleList)
 }
 
+func (this *RBACCtl) showClusterRole(ctx *gin.Context) any {
+	uri := &struct {
+		ClusterRoleName string `uri:"clusterRole" binding:"required"`
+	}{}
+
+	athena.Error(ctx.BindUri(uri))
+
+	return this.ClusterRoleSvc.Show(uri.ClusterRoleName)
+}
+
+func (this *RBACCtl) createClusterRole(ctx *gin.Context) any {
+	clusterRole := &rbacV1.ClusterRole{}
+	athena.Error(ctx.BindJSON(clusterRole))
+	athena.Error(this.ClusterRoleSvc.Create(clusterRole))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return clusterRole
+}
+
+func (this *RBACCtl) updateClusterRole(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		ClusterRoleName string `uri:"clusterRole" binding:"required"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+
+	clusterRole := &rbacV1.ClusterRole{}
+	athena.Error(ctx.BindJSON(clusterRole))
+
+	athena.Error(this.ClusterRoleSvc.Update(uri.ClusterRoleName, clusterRole.Rules))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -181,4 +215,10 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("GET", "/serviceAccounts", this.serviceAccounts)
 	// clusterRole列表
 	athena.Handle("GET", "/clusterRoles", this.clusterRoles)
+	// 查看clusterRole
+	athena.Handle("GET", "/clusterRole/:clusterRole", this.showClusterRole)
+	// 创建clusterRole
+	athena.Handle("POST", "/clusterRole", this.createClusterRole)
+	// 编辑clusterRole
+	athena.Handle("PUT", "/clusterRole/:clusterRole", this.updateClusterRole)
 }
