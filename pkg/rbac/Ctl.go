@@ -10,10 +10,11 @@ import (
 
 // RBACCtl @Controller
 type RBACCtl struct {
-	RoleSvc           *RoleService           `inject:"-"`
-	RoleBindingSvc    *RoleBindingService    `inject:"-"`
-	ServiceAccountSvc *ServiceAccountService `inject:"-"`
-	ClusterRoleSvc    *ClusterRoleService    `inject:"-"`
+	RoleSvc               *RoleService               `inject:"-"`
+	RoleBindingSvc        *RoleBindingService        `inject:"-"`
+	ServiceAccountSvc     *ServiceAccountService     `inject:"-"`
+	ClusterRoleSvc        *ClusterRoleService        `inject:"-"`
+	ClusterRoleBindingSvc *ClusterRoleBindingService `inject:"-"`
 }
 
 func NewRBACCtl() *RBACCtl {
@@ -166,6 +167,12 @@ func (this *RBACCtl) clusterRoles(ctx *gin.Context) athena.Collection {
 	return this.ClusterRoleSvc.Paging(page, clusterRoleList)
 }
 
+func (this *RBACCtl) clusterRolesAll(ctx *gin.Context) any {
+	clusterRolesList := this.ClusterRoleSvc.List()
+
+	return clusterRolesList
+}
+
 func (this *RBACCtl) showClusterRole(ctx *gin.Context) any {
 	uri := &struct {
 		ClusterRoleName string `uri:"clusterRole" binding:"required"`
@@ -211,6 +218,61 @@ func (this *RBACCtl) deleteClusterRole(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *RBACCtl) clusterRoleBindings(ctx *gin.Context) athena.Collection {
+	page := athena.NewPageWithCtx(ctx)
+	clusterRoleBindingList := this.ClusterRoleBindingSvc.List()
+
+	return this.ClusterRoleBindingSvc.Paging(page, clusterRoleBindingList)
+}
+
+func (this *RBACCtl) addUserToClusterRoleBinding(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		ClusterRoleBindingName string `uri:"clusterRoleBinding" binding:"required"`
+	}{}
+	subject := &rbacV1.Subject{}
+
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(ctx.BindJSON(subject))
+	athena.Error(this.ClusterRoleBindingSvc.AddUser(uri.ClusterRoleBindingName, subject))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
+func (this *RBACCtl) removeUserFromClusterRoleBinding(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		ClusterRoleBindingName string `uri:"clusterRoleBinding" binding:"required"`
+	}{}
+	subject := &rbacV1.Subject{}
+
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(ctx.BindJSON(subject))
+	athena.Error(this.ClusterRoleBindingSvc.RemoveUser(uri.ClusterRoleBindingName, subject))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
+func (this *RBACCtl) createClusterRoleBinding(ctx *gin.Context) any {
+	clusterRoleBinding := &rbacV1.ClusterRoleBinding{}
+	athena.Error(ctx.BindJSON(clusterRoleBinding))
+	athena.Error(this.ClusterRoleBindingSvc.Create(clusterRoleBinding))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return clusterRoleBinding
+}
+
+func (this *RBACCtl) deleteClusterRoleBinding(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		ClusterRoleBindingName string `uri:"clusterRoleBinding" binding:"required"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.ClusterRoleBindingSvc.Delete(uri.ClusterRoleBindingName))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -240,6 +302,8 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("DELETE", "/serviceAccount/:ns/:serviceAccount", this.deleteServiceAccount)
 	// clusterRole列表
 	athena.Handle("GET", "/clusterRoles", this.clusterRoles)
+	// 获取全部clusterRole
+	athena.Handle("GET", "/clusterRoles/all", this.clusterRolesAll)
 	// 查看clusterRole
 	athena.Handle("GET", "/clusterRole/:clusterRole", this.showClusterRole)
 	// 创建clusterRole
@@ -248,4 +312,14 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("PUT", "/clusterRole/:clusterRole", this.updateClusterRole)
 	// 删除clusterRole
 	athena.Handle("DELETE", "/clusterRole/:clusterRole", this.deleteClusterRole)
+	// clusterRoleBinding列表
+	athena.Handle("GET", "/clusterRoleBindings", this.clusterRoleBindings)
+	// clusterRoleBinding增加user
+	athena.Handle("PATCH", "/clusterRoleBinding/:clusterRoleBinding/user", this.addUserToClusterRoleBinding)
+	// clusterRoleBinding移除user
+	athena.Handle("PATCH", "/clusterRoleBinding/:clusterRoleBinding/user/remove", this.removeUserFromClusterRoleBinding)
+	// 创建clusterRoleBinding
+	athena.Handle("POST", "/clusterRoleBinding", this.createClusterRoleBinding)
+	// 删除clusterRoleBinding
+	athena.Handle("DELETE", "/clusterRoleBinding/:clusterRoleBinding", this.deleteClusterRoleBinding)
 }

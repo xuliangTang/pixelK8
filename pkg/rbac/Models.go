@@ -45,3 +45,10 @@ type ClusterRoleDetailModel struct {
 	Annotations map[string]string   `json:"annotations"`
 	CreatedAt   string              `json:"created_at"`
 }
+
+type ClusterRoleBindingListModel struct {
+	Name      string           `json:"name"`
+	RoleRef   string           `json:"role_ref"`
+	Subjects  []rbacV1.Subject `json:"subjects"`
+	CreatedAt string           `json:"created_at"`
+}

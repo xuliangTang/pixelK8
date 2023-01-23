@@ -20,7 +20,7 @@ func (this *ClusterRoleHandler) OnAdd(obj interface{}) {
 
 		// 通知ws客户端
 		clusterRoleList := this.ClusterRoleSvc.List()
-		page := athena.NewPage(1, 5)
+		page := athena.NewPage(1, 10)
 		ws.ClientMap.SendAll(dto.WS{
 			Type: "clusterRoles",
 			Result: gin.H{
@@ -37,7 +37,7 @@ func (this *ClusterRoleHandler) OnUpdate(oldObj, newObj interface{}) {
 
 		// 通知ws客户端
 		clusterRoleList := this.ClusterRoleSvc.List()
-		page := athena.NewPage(1, 5)
+		page := athena.NewPage(1, 10)
 		ws.ClientMap.SendAll(dto.WS{
 			Type: "clusterRoles",
 			Result: gin.H{
@@ -54,7 +54,7 @@ func (this *ClusterRoleHandler) OnDelete(obj interface{}) {
 
 		// 通知ws客户端
 		clusterRoleList := this.ClusterRoleSvc.List()
-		page := athena.NewPage(1, 5)
+		page := athena.NewPage(1, 10)
 		ws.ClientMap.SendAll(dto.WS{
 			Type: "clusterRoles",
 			Result: gin.H{

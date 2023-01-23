@@ -67,3 +67,7 @@ func (*K8sInformerHandlerCfg) InitServiceAccountHandler() *rbac.ServiceAccountHa
 func (*K8sInformerHandlerCfg) InitClusterRoleHandler() *rbac.ClusterRoleHandler {
 	return &rbac.ClusterRoleHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitClusterRoleBindingHandler() *rbac.ClusterRoleBindingHandler {
+	return &rbac.ClusterRoleBindingHandler{}
+}

@@ -63,3 +63,7 @@ func (*ServiceCfg) InitServiceAccountService() *rbac.ServiceAccountService {
 func (*ServiceCfg) InitClusterRoleService() *rbac.ClusterRoleService {
 	return rbac.NewClusterRoleService()
 }
+
+func (*ServiceCfg) InitClusterRoleBindingService() *rbac.ClusterRoleBindingService {
+	return rbac.NewClusterRoleBindingService()
+}
