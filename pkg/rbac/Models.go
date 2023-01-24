@@ -52,3 +52,8 @@ type ClusterRoleBindingListModel struct {
 	Subjects  []rbacV1.Subject `json:"subjects"`
 	CreatedAt string           `json:"created_at"`
 }
+
+type UserAccountModel struct {
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+}

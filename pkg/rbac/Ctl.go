@@ -15,6 +15,7 @@ type RBACCtl struct {
 	ServiceAccountSvc     *ServiceAccountService     `inject:"-"`
 	ClusterRoleSvc        *ClusterRoleService        `inject:"-"`
 	ClusterRoleBindingSvc *ClusterRoleBindingService `inject:"-"`
+	UserAccountService    *UserAccountService        `inject:"-"`
 }
 
 func NewRBACCtl() *RBACCtl {
@@ -273,6 +274,37 @@ func (this *RBACCtl) deleteClusterRoleBinding(ctx *gin.Context) (v athena.Void) 
 	return
 }
 
+func (this *RBACCtl) userAccounts(ctx *gin.Context) any {
+	page := athena.NewPageWithCtx(ctx)
+	userAccountList, err := this.UserAccountService.List()
+	athena.Error(err)
+
+	return this.UserAccountService.Paging(page, userAccountList)
+}
+
+func (this *RBACCtl) createUserAccount(ctx *gin.Context) any {
+	reqData := &struct {
+		CN string `json:"cn" binding:"required,min=2"`
+		O  string `json:"o"`
+	}{}
+	athena.Error(ctx.BindJSON(reqData))
+	athena.Error(this.UserAccountService.Create(reqData.CN, reqData.O))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return reqData
+}
+
+func (this *RBACCtl) deleteUserAccount(ctx *gin.Context) (v athena.Void) {
+	uri := &struct {
+		CN string `uri:"cn" binding:"required,min=2"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.UserAccountService.Delete(uri.CN))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -322,4 +354,10 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/clusterRoleBinding", this.createClusterRoleBinding)
 	// 删除clusterRoleBinding
 	athena.Handle("DELETE", "/clusterRoleBinding/:clusterRoleBinding", this.deleteClusterRoleBinding)
+	// userAccount列表
+	athena.Handle("GET", "/userAccounts", this.userAccounts)
+	// 创建userAccount
+	athena.Handle("POST", "/userAccount", this.createUserAccount)
+	// 删除userAccount
+	athena.Handle("DELETE", "/userAccount/:cn", this.deleteUserAccount)
 }
