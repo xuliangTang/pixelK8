@@ -16,6 +16,7 @@ type AppProperties struct {
 type K8sOpt struct {
 	Host            string
 	Port            int32
+	ApiServer       string
 	DefaultNs       string
 	KubeConfigPath  string
 	Nodes           map[string]*NodeOpt `mapstructure:"nodes"`

@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 	"math/big"
 	mathRand "math/rand"
 	"os"
@@ -166,4 +168,44 @@ func (*UserAccountService) ParseK8sCA() (*x509.Certificate, *rsa.PrivateKey, err
 	}
 
 	return caCert, caPriKey, nil
+}
+
+// Kubeconfig 生成userAccount的kubeconfig
+func (*UserAccountService) Kubeconfig(cn string) ([]byte, error) {
+	cfg := api.NewConfig()
+	const clusterName = "kubernetes"
+
+	k8sCertData, err := CertData(properties.App.K8s.CACrtPath)
+	if err != nil {
+		return nil, err
+	}
+	cfg.Clusters[clusterName] = &api.Cluster{
+		Server:                   properties.App.K8s.ApiServer,
+		CertificateAuthorityData: k8sCertData,
+	}
+
+	contextName := fmt.Sprintf("%s@kubernetes", cn)
+	cfg.Contexts[contextName] = &api.Context{
+		AuthInfo: cn,
+		Cluster:  clusterName,
+	}
+	cfg.CurrentContext = contextName
+
+	userCertFile := fmt.Sprintf("%s/%s.pem", properties.App.K8s.UserAccountPath, cn)
+	userCertKeyFile := fmt.Sprintf("%s/%s_key.pem", properties.App.K8s.UserAccountPath, cn)
+	clientKeyData, err := CertData(userCertKeyFile)
+	if err != nil {
+		return nil, err
+	}
+	clientCertData, err := CertData(userCertFile)
+	if err != nil {
+		return nil, err
+	}
+	cfg.AuthInfos[cn] = &api.AuthInfo{
+		ClientKeyData:         clientKeyData,
+		ClientCertificateData: clientCertData,
+	}
+
+	fileContent, err := clientcmd.Write(*cfg)
+	return fileContent, err
 }

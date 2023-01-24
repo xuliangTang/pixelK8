@@ -305,6 +305,16 @@ func (this *RBACCtl) deleteUserAccount(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *RBACCtl) userAccountKubeconfig(ctx *gin.Context) any {
+	uri := &struct {
+		CN string `uri:"cn" binding:"required,min=2"`
+	}{}
+	athena.Error(ctx.BindUri(uri))
+	content := athena.Unwrap(this.UserAccountService.Kubeconfig(uri.CN)).([]byte)
+
+	return string(content)
+}
+
 func (this *RBACCtl) Build(athena *athena.Athena) {
 	// role列表
 	athena.Handle("GET", "/roles", this.roles)
@@ -360,4 +370,6 @@ func (this *RBACCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/userAccount", this.createUserAccount)
 	// 删除userAccount
 	athena.Handle("DELETE", "/userAccount/:cn", this.deleteUserAccount)
+	// 生成userAccount的kubeconfig
+	athena.Handle("GET", "/userAccount/:cn/kubeconfig", this.userAccountKubeconfig)
 }
