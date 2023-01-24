@@ -7,4 +7,7 @@ test.go
 static.go
 run.bat
 
+/ua
 kubeconfig
+k8s-ca.crt
+k8s-ca.key
