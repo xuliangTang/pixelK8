@@ -61,6 +61,16 @@ func (this *DeploymentService) Paging(page *athena.Page, depList []*dto.Deployme
 	return *collection
 }
 
+// Show 查看deployment
+func (this *DeploymentService) Show(uri *requests.ShowDeploymentUri) *appsV1.Deployment {
+	dep, err := this.DeploymentMap.Find(uri.Namespace, uri.Deployment)
+	if err != nil {
+		return nil
+	}
+
+	return dep
+}
+
 // Delete 删除deployment
 func (this *DeploymentService) Delete(uri *requests.DeleteDeploymentUri) error {
 	return this.K8sClient.AppsV1().Deployments(uri.Namespace).

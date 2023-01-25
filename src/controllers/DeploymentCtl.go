@@ -27,6 +27,13 @@ func (this *DeploymentCtl) deployments(ctx *gin.Context) athena.Collection {
 	return this.DeploymentService.Paging(page, depList)
 }
 
+func (this *DeploymentCtl) showDeployment(ctx *gin.Context) any {
+	uri := &requests.ShowDeploymentUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	return this.DeploymentService.Show(uri)
+}
+
 func (this *DeploymentCtl) deploymentPods(ctx *gin.Context) any {
 	ns := ctx.DefaultQuery("ns", properties.App.K8s.DefaultNs)
 	var uri requests.DeploymentUri
@@ -48,8 +55,10 @@ func (this *DeploymentCtl) deleteDeployment(ctx *gin.Context) (v athena.Void) {
 func (this *DeploymentCtl) Build(athena *athena.Athena) {
 	// Deployment 列表
 	athena.Handle("GET", "/deployments", this.deployments)
+	// 查看 Deployment
+	athena.Handle("GET", "/deployment/:ns/:deployment", this.showDeployment)
 	// Deployment Pod 列表
-	athena.Handle("GET", "/deployment/:deployment/pods", this.deploymentPods)
+	// athena.Handle("GET", "/deployment/:deployment/pods", this.deploymentPods)
 	// 删除 Deployment
 	athena.Handle("DELETE", "/deployment/:ns/:deployment", this.deleteDeployment)
 }
