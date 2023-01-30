@@ -71,6 +71,20 @@ func (this *DeploymentService) Show(uri *requests.ShowDeploymentUri) *appsV1.Dep
 	return dep
 }
 
+// Create 创建deployment
+func (this *DeploymentService) Create(deploy *appsV1.Deployment) error {
+	_, err := this.K8sClient.AppsV1().Deployments(deploy.Namespace).
+		Create(context.Background(), deploy, metaV1.CreateOptions{})
+	return err
+}
+
+// Update 编辑deployment
+func (this *DeploymentService) Update(ns string, deploy *appsV1.Deployment) error {
+	_, err := this.K8sClient.AppsV1().Deployments(ns).
+		Update(context.Background(), deploy, metaV1.UpdateOptions{})
+	return err
+}
+
 // Delete 删除deployment
 func (this *DeploymentService) Delete(uri *requests.DeleteDeploymentUri) error {
 	return this.K8sClient.AppsV1().Deployments(uri.Namespace).

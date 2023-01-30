@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	appsV1 "k8s.io/api/apps/v1"
 	"net/http"
 	"pixelk8/src/properties"
 	"pixelk8/src/requests"
@@ -43,6 +44,27 @@ func (this *DeploymentCtl) deploymentPods(ctx *gin.Context) any {
 	return podList
 }
 
+func (this *DeploymentCtl) createDeployment(ctx *gin.Context) any {
+	deployment := &appsV1.Deployment{}
+	athena.Error(ctx.BindJSON(deployment))
+	athena.Error(this.DeploymentService.Create(deployment))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return deployment
+}
+
+func (this *DeploymentCtl) updateDeployment(ctx *gin.Context) (v athena.Void) {
+	uri := &requests.UpdateDeploymentUri{}
+	deployment := &appsV1.Deployment{}
+
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(ctx.BindJSON(deployment))
+	athena.Error(this.DeploymentService.Update(uri.Namespace, deployment))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *DeploymentCtl) deleteDeployment(ctx *gin.Context) (v athena.Void) {
 	uri := &requests.DeleteDeploymentUri{}
 	athena.Error(ctx.BindUri(uri))
@@ -57,6 +79,10 @@ func (this *DeploymentCtl) Build(athena *athena.Athena) {
 	athena.Handle("GET", "/deployments", this.deployments)
 	// 查看 Deployment
 	athena.Handle("GET", "/deployment/:ns/:deployment", this.showDeployment)
+	// 创建 Deployment
+	athena.Handle("POST", "/deployment", this.createDeployment)
+	// 编辑 Deployment
+	athena.Handle("PUT", "/deployment/:ns", this.updateDeployment)
 	// Deployment Pod 列表
 	// athena.Handle("GET", "/deployment/:deployment/pods", this.deploymentPods)
 	// 删除 Deployment
