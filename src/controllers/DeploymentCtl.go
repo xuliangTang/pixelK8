@@ -46,7 +46,15 @@ func (this *DeploymentCtl) deploymentPods(ctx *gin.Context) any {
 
 func (this *DeploymentCtl) createDeployment(ctx *gin.Context) any {
 	deployment := &appsV1.Deployment{}
+	query := &requests.CreateDeploymentQuery{}
+
 	athena.Error(ctx.BindJSON(deployment))
+	athena.Error(ctx.BindQuery(query))
+
+	if query.Fastmod {
+		this.DeploymentService.InitLabel(deployment)
+	}
+
 	athena.Error(this.DeploymentService.Create(deployment))
 
 	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)

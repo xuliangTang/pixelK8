@@ -7,3 +7,7 @@ type PodContainerLogsQuery struct {
 type PodContainerTerminalQuery struct {
 	ContainerName string `form:"container_name" binding:"required"`
 }
+
+type CreateDeploymentQuery struct {
+	Fastmod bool `form:"fastmod"`
+}

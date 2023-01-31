@@ -78,6 +78,22 @@ func (this *DeploymentService) Create(deploy *appsV1.Deployment) error {
 	return err
 }
 
+// InitLabel 初始化deployment的matchLabel
+func (this *DeploymentService) InitLabel(deploy *appsV1.Deployment) {
+	if deploy.Spec.Selector == nil {
+		deploy.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"app": deploy.Name}}
+	}
+	if deploy.Spec.Selector.MatchLabels == nil {
+		deploy.Spec.Selector.MatchLabels = map[string]string{"app": deploy.Name}
+	}
+	if deploy.Spec.Template.ObjectMeta.Labels == nil {
+		deploy.Spec.Template.ObjectMeta.Labels = map[string]string{"app": deploy.Name}
+	}
+	deploy.Spec.Selector.MatchLabels["app"] = deploy.Name
+
+	deploy.Spec.Template.ObjectMeta.Labels["app"] = deploy.Name
+}
+
 // Update 编辑deployment
 func (this *DeploymentService) Update(ns string, deploy *appsV1.Deployment) error {
 	_, err := this.K8sClient.AppsV1().Deployments(ns).
