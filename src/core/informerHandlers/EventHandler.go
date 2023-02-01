@@ -10,11 +10,19 @@ type EventHandler struct {
 }
 
 func (this *EventHandler) OnAdd(obj interface{}) {
-	this.EventMap.Add(obj.(*coreV1.Event))
+	if event, ok := obj.(*coreV1.Event); ok {
+		this.EventMap.Add(event)
+	}
 }
+
 func (this *EventHandler) OnUpdate(oldObj, newObj interface{}) {
-	this.EventMap.Add(newObj.(*coreV1.Event))
+	if event, ok := newObj.(*coreV1.Event); ok {
+		this.EventMap.Add(event)
+	}
 }
+
 func (this *EventHandler) OnDelete(obj interface{}) {
-	this.EventMap.Delete(obj.(*coreV1.Event))
+	if event, ok := obj.(*coreV1.Event); ok {
+		this.EventMap.Delete(event)
+	}
 }
