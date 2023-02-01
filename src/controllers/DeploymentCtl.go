@@ -35,11 +35,17 @@ func (this *DeploymentCtl) showDeployment(ctx *gin.Context) any {
 	return this.DeploymentService.Show(uri)
 }
 
+func (this *DeploymentCtl) deploymentInfo(ctx *gin.Context) any {
+	uri := &requests.ShowDeploymentUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	return this.DeploymentService.Info(uri)
+}
+
 func (this *DeploymentCtl) deploymentPods(ctx *gin.Context) any {
-	ns := ctx.DefaultQuery("ns", properties.App.K8s.DefaultNs)
 	var uri requests.DeploymentUri
 	athena.Error(ctx.BindUri(&uri))
-	podList := this.PodService.ListByDeployment(ns, uri.Deployment)
+	podList := this.PodService.ListByDeployment(uri.Namespace, uri.Deployment)
 
 	return podList
 }
@@ -85,14 +91,16 @@ func (this *DeploymentCtl) deleteDeployment(ctx *gin.Context) (v athena.Void) {
 func (this *DeploymentCtl) Build(athena *athena.Athena) {
 	// Deployment 列表
 	athena.Handle("GET", "/deployments", this.deployments)
-	// 查看 Deployment
+	// 获取原生 Deployment
 	athena.Handle("GET", "/deployment/:ns/:deployment", this.showDeployment)
+	// 查看 Deployment
+	athena.Handle("GET", "/deployment/:ns/:deployment/info", this.deploymentInfo)
 	// 创建 Deployment
 	athena.Handle("POST", "/deployment", this.createDeployment)
 	// 编辑 Deployment
 	athena.Handle("PUT", "/deployment/:ns", this.updateDeployment)
 	// Deployment Pod 列表
-	// athena.Handle("GET", "/deployment/:deployment/pods", this.deploymentPods)
+	athena.Handle("GET", "/deployment/:ns/:deployment/pods", this.deploymentPods)
 	// 删除 Deployment
 	athena.Handle("DELETE", "/deployment/:ns/:deployment", this.deleteDeployment)
 }

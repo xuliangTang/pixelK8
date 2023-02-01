@@ -61,7 +61,7 @@ func (this *DeploymentService) Paging(page *athena.Page, depList []*dto.Deployme
 	return *collection
 }
 
-// Show 查看deployment
+// Show 获取deployment原生对象
 func (this *DeploymentService) Show(uri *requests.ShowDeploymentUri) *appsV1.Deployment {
 	dep, err := this.DeploymentMap.Find(uri.Namespace, uri.Deployment)
 	if err != nil {
@@ -69,6 +69,24 @@ func (this *DeploymentService) Show(uri *requests.ShowDeploymentUri) *appsV1.Dep
 	}
 
 	return dep
+}
+
+// Info 查看deployment
+func (this *DeploymentService) Info(uri *requests.ShowDeploymentUri) dto.DeploymentInfo {
+	dep, err := this.DeploymentMap.Find(uri.Namespace, uri.Deployment)
+	if err != nil {
+		return dto.DeploymentInfo{}
+	}
+
+	return dto.DeploymentInfo{
+		Name:        dep.Name,
+		Namespace:   dep.Namespace,
+		Replicas:    [3]int32{dep.Status.Replicas, dep.Status.AvailableReplicas, dep.Status.UnavailableReplicas},
+		Images:      this.CommonService.GetImageShortName(dep.Spec.Template.Spec.Containers),
+		IsCompleted: this.checkDeploymentIsCompleted(dep),
+		Message:     this.getDeploymentConditionsMessage(dep),
+		CreatedAt:   dep.CreationTimestamp.Format("2006-01-02 15:04:05"),
+	}
 }
 
 // Create 创建deployment

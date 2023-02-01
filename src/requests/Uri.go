@@ -1,6 +1,7 @@
 package requests
 
 type DeploymentUri struct {
+	Namespace  string `uri:"ns" binding:"required"`
 	Deployment string `uri:"deployment" binding:"required"`
 }
 
