@@ -2,6 +2,7 @@ package configurations
 
 import (
 	"pixelk8/pkg/rbac"
+	"pixelk8/pkg/tekton"
 	"pixelk8/src/core/maps"
 )
 
@@ -70,4 +71,8 @@ func (*K8sMapCfg) InitClusterRoleMap() *rbac.ClusterRoleMap {
 
 func (*K8sMapCfg) InitCLusterRoleBindingMap() *rbac.ClusterRoleBindingMap {
 	return &rbac.ClusterRoleBindingMap{}
+}
+
+func (*K8sMapCfg) InitTektonTaskMap() *tekton.TaskMapStruct {
+	return &tekton.TaskMapStruct{}
 }

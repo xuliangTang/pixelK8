@@ -1,11 +1,19 @@
 package configurations
 
 import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"log"
 	"pixelk8/pkg/rbac"
+	"pixelk8/pkg/tekton"
 	"pixelk8/src/core/informerHandlers"
+	"pixelk8/src/properties"
 )
 
 // K8sInformerStart @configuration
@@ -26,6 +34,7 @@ type K8sInformerStart struct {
 	ServiceAccountHandler     *rbac.ServiceAccountHandler         `inject:"-"`
 	ClusterRoleHandler        *rbac.ClusterRoleHandler            `inject:"-"`
 	ClusterRoleBindingHandler *rbac.ClusterRoleBindingHandler     `inject:"-"`
+	TektonTaskHandler         *tekton.TaskHandler                 `inject:"-"`
 }
 
 func NewK8sInformerStart() *K8sInformerStart {
@@ -83,4 +92,29 @@ func (this *K8sInformerStart) InitInformer() informers.SharedInformerFactory {
 	informerFactory.Start(wait.NeverStop)
 
 	return informerFactory
+}
+
+func (*K8sInformerStart) K8sRestConfig() *rest.Config {
+	config, err := clientcmd.BuildConfigFromFlags("", properties.App.K8s.KubeConfigPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return config
+}
+
+// 动态informers处理
+var taskResource = schema.GroupVersionResource{Group: "tekton.dev", Resource: "tasks", Version: "v1beta1"}
+
+func (this *K8sInformerStart) InitGenericInformer() dynamicinformer.DynamicSharedInformerFactory {
+	client, err := dynamic.NewForConfig(this.K8sRestConfig())
+	if err != nil {
+		log.Fatal(err)
+	}
+	di := dynamicinformer.NewDynamicSharedInformerFactory(client, 0)
+
+	taskInformer := di.ForResource(taskResource)
+	taskInformer.Informer().AddEventHandler(this.TektonTaskHandler)
+
+	di.Start(wait.NeverStop)
+	return di
 }

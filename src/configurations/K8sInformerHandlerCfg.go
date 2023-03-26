@@ -2,6 +2,7 @@ package configurations
 
 import (
 	"pixelk8/pkg/rbac"
+	"pixelk8/pkg/tekton"
 	"pixelk8/src/core/informerHandlers"
 )
 
@@ -70,4 +71,8 @@ func (*K8sInformerHandlerCfg) InitClusterRoleHandler() *rbac.ClusterRoleHandler 
 
 func (*K8sInformerHandlerCfg) InitClusterRoleBindingHandler() *rbac.ClusterRoleBindingHandler {
 	return &rbac.ClusterRoleBindingHandler{}
+}
+
+func (*K8sInformerHandlerCfg) InitTektonTaskHandler() *tekton.TaskHandler {
+	return &tekton.TaskHandler{}
 }

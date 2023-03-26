@@ -2,6 +2,7 @@ package configurations
 
 import (
 	"pixelk8/pkg/rbac"
+	"pixelk8/pkg/tekton"
 	"pixelk8/src/services"
 )
 
@@ -66,4 +67,8 @@ func (*ServiceCfg) InitClusterRoleService() *rbac.ClusterRoleService {
 
 func (*ServiceCfg) InitClusterRoleBindingService() *rbac.ClusterRoleBindingService {
 	return rbac.NewClusterRoleBindingService()
+}
+
+func (*ServiceCfg) InitTektonService() *tekton.TektonService {
+	return tekton.NewTektonService()
 }

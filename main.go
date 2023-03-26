@@ -6,6 +6,7 @@ import (
 	"github.com/xuliangTang/athena/athena/plugins"
 	"pixelk8/pkg/rbac"
 	"pixelk8/pkg/resource"
+	"pixelk8/pkg/tekton"
 	"pixelk8/src/configurations"
 	"pixelk8/src/controllers"
 	"pixelk8/src/properties"
@@ -33,7 +34,8 @@ func main() {
 			controllers.NewConfigmapCtl(),
 			controllers.NewNodeCtl(),
 			resource.NewResourceCtl(),
-			rbac.NewRBACCtl())
+			rbac.NewRBACCtl(),
+			tekton.NewTektonCtl())
 
 	/*server.GET("/c/*filepath", func(context *gin.Context) {
 		http.FileServer(FS(false)).ServeHTTP(context.Writer, context.Request)
