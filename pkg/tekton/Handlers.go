@@ -6,6 +6,8 @@ import (
 	"pixelk8/src/ws"
 )
 
+// task
+
 type TaskHandler struct {
 	TaskMap *TaskMapStruct `inject:"-"`
 }
@@ -49,6 +51,55 @@ func (this *TaskHandler) OnDelete(obj interface{}) {
 			"type": "task",
 			"result": gin.H{"ns": ns,
 				"data": this.TaskMap.ListAll(ns)},
+		},
+	)
+}
+
+//Pipeline
+
+type PipelineHandler struct {
+	PipelineMap *PipelineMapStruct `inject:"-"`
+}
+
+func (this *PipelineHandler) OnAdd(obj interface{}) {
+	getObj := ConvertToPipeline(obj)
+	this.PipelineMap.Add(getObj)
+	ns := getObj.Namespace
+	ws.ClientMap.SendAll(
+		gin.H{
+			"type": "pipeline",
+			"result": gin.H{"ns": ns,
+				"data": this.PipelineMap.ListAll(ns)},
+		},
+	)
+}
+
+func (this *PipelineHandler) OnUpdate(oldObj, newObj interface{}) {
+	getObj := ConvertToPipeline(newObj)
+	err := this.PipelineMap.Update(getObj)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	ns := getObj.Namespace
+	ws.ClientMap.SendAll(
+		gin.H{
+			"type": "pipeline",
+			"result": gin.H{"ns": ns,
+				"data": this.PipelineMap.ListAll(ns)},
+		},
+	)
+}
+
+func (this *PipelineHandler) OnDelete(obj interface{}) {
+	getObj := ConvertToPipeline(obj)
+	this.PipelineMap.Delete(getObj)
+	ns := getObj.Namespace
+	ws.ClientMap.SendAll(
+		gin.H{
+			"type": "pipeline",
+			"result": gin.H{"ns": ns,
+				"data": this.PipelineMap.ListAll(ns)},
 		},
 	)
 }

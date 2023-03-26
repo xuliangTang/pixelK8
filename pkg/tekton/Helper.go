@@ -17,3 +17,12 @@ func ConvertToTask(obj interface{}) *v1beta1.Task {
 
 	return task
 }
+
+// ConvertToPipeline 把对象转化为 pipeline
+func ConvertToPipeline(obj interface{}) *v1beta1.Pipeline {
+	pipeline := &v1beta1.Pipeline{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, pipeline); err != nil {
+		return nil
+	}
+	return pipeline
+}

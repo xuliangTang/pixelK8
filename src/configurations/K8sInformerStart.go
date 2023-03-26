@@ -35,6 +35,7 @@ type K8sInformerStart struct {
 	ClusterRoleHandler        *rbac.ClusterRoleHandler            `inject:"-"`
 	ClusterRoleBindingHandler *rbac.ClusterRoleBindingHandler     `inject:"-"`
 	TektonTaskHandler         *tekton.TaskHandler                 `inject:"-"`
+	TektonPipelineHandler     *tekton.PipelineHandler             `inject:"-"`
 }
 
 func NewK8sInformerStart() *K8sInformerStart {
@@ -104,6 +105,7 @@ func (*K8sInformerStart) K8sRestConfig() *rest.Config {
 
 // 动态informers处理
 var taskResource = schema.GroupVersionResource{Group: "tekton.dev", Resource: "tasks", Version: "v1beta1"}
+var pipelineResource = schema.GroupVersionResource{Group: "tekton.dev", Resource: "pipelines", Version: "v1beta1"}
 
 func (this *K8sInformerStart) InitGenericInformer() dynamicinformer.DynamicSharedInformerFactory {
 	client, err := dynamic.NewForConfig(this.K8sRestConfig())
@@ -114,6 +116,7 @@ func (this *K8sInformerStart) InitGenericInformer() dynamicinformer.DynamicShare
 
 	taskInformer := di.ForResource(taskResource)
 	taskInformer.Informer().AddEventHandler(this.TektonTaskHandler)
+	di.ForResource(pipelineResource).Informer().AddEventHandler(this.TektonPipelineHandler)
 
 	di.Start(wait.NeverStop)
 	return di

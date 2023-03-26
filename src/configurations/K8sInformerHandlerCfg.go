@@ -76,3 +76,7 @@ func (*K8sInformerHandlerCfg) InitClusterRoleBindingHandler() *rbac.ClusterRoleB
 func (*K8sInformerHandlerCfg) InitTektonTaskHandler() *tekton.TaskHandler {
 	return &tekton.TaskHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitTektonPipelineHandler() *tekton.PipelineHandler {
+	return &tekton.PipelineHandler{}
+}

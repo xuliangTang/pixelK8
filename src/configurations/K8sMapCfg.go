@@ -76,3 +76,7 @@ func (*K8sMapCfg) InitCLusterRoleBindingMap() *rbac.ClusterRoleBindingMap {
 func (*K8sMapCfg) InitTektonTaskMap() *tekton.TaskMapStruct {
 	return &tekton.TaskMapStruct{}
 }
+
+func (*K8sMapCfg) InitTektonPipelineMap() *tekton.PipelineMapStruct {
+	return &tekton.PipelineMapStruct{}
+}
