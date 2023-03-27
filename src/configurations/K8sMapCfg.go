@@ -80,3 +80,7 @@ func (*K8sMapCfg) InitTektonTaskMap() *tekton.TaskMapStruct {
 func (*K8sMapCfg) InitTektonPipelineMap() *tekton.PipelineMapStruct {
 	return &tekton.PipelineMapStruct{}
 }
+
+func (*K8sMapCfg) InitTektonPipelineRunMap() *tekton.PipelineRunMapStruct {
+	return &tekton.PipelineRunMapStruct{}
+}

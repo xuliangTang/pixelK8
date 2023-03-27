@@ -93,6 +93,45 @@ func (this *TektonCtl) deletePipeline(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *TektonCtl) pipelineRunList(ctx *gin.Context) any {
+	ns := ctx.DefaultQuery("ns", "default")
+	return this.TektonService.ListPipelineRunByNs(ns)
+}
+
+func (this *TektonCtl) showPipelineRun(ctx *gin.Context) any {
+	uri := &RsUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	return this.TektonService.ShowPipelineRun(uri.Namespace, uri.Name)
+}
+
+func (this *TektonCtl) createPipelineRun(ctx *gin.Context) (v athena.Void) {
+	pipelineRun := &v1beta1.PipelineRun{}
+	athena.Error(ctx.BindJSON(pipelineRun))
+	athena.Error(this.TektonService.CreatePipelineRun(pipelineRun))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
+func (this *TektonCtl) updatePipelineRun(ctx *gin.Context) (v athena.Void) {
+	pipelineRun := &v1beta1.PipelineRun{}
+	athena.Error(ctx.BindJSON(pipelineRun))
+	athena.Error(this.TektonService.UpdatePipelineRun(pipelineRun))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return
+}
+
+func (this *TektonCtl) deletePipelineRun(ctx *gin.Context) (v athena.Void) {
+	uri := &RsUri{}
+	athena.Error(ctx.BindUri(uri))
+	athena.Error(this.TektonService.DeletePipelineRun(uri.Namespace, uri.Name))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
 func (this *TektonCtl) Build(athena *athena.Athena) {
 	// task列表
 	athena.Handle(http.MethodGet, "/tekton/tasks", this.taskList)
@@ -115,4 +154,15 @@ func (this *TektonCtl) Build(athena *athena.Athena) {
 	athena.Handle(http.MethodPut, "/tekton/pipeline", this.updatePipeline)
 	// 删除pipeline
 	athena.Handle(http.MethodDelete, "/tekton/pipeline/:ns/:name", this.deletePipeline)
+
+	// pipelineRun列表
+	athena.Handle(http.MethodGet, "/tekton/pipelineruns", this.pipelineRunList)
+	// pipelineRun详情
+	athena.Handle(http.MethodGet, "/tekton/pipelinerun/:ns/:name", this.showPipelineRun)
+	// 创建pipelineRun
+	athena.Handle(http.MethodPost, "/tekton/pipelinerun", this.createPipelineRun)
+	// 更新pipelineRun
+	athena.Handle(http.MethodPut, "/tekton/pipelinerun", this.updatePipelineRun)
+	// 删除pipelineRun
+	athena.Handle(http.MethodDelete, "/tekton/pipelinerun/:ns/:name", this.deletePipelineRun)
 }

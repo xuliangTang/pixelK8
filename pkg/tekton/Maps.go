@@ -152,3 +152,77 @@ func (this *PipelineMapStruct) Find(ns, name string) *v1beta1.Pipeline {
 
 	return &v1beta1.Pipeline{}
 }
+
+// pipeline run
+
+type V1PipelineRun []*v1beta1.PipelineRun
+
+func (this V1PipelineRun) Len() int {
+	return len(this)
+}
+
+func (this V1PipelineRun) Less(i, j int) bool {
+	return this[i].CreationTimestamp.Time.After(this[j].CreationTimestamp.Time)
+}
+
+func (this V1PipelineRun) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}
+
+type PipelineRunMapStruct struct {
+	data sync.Map // [ns string] []*v1beta1.pipeline
+}
+
+func (this *PipelineRunMapStruct) Add(item *v1beta1.PipelineRun) {
+	if list, ok := this.data.Load(item.Namespace); ok {
+		list = append(list.([]*v1beta1.PipelineRun), item)
+		this.data.Store(item.Namespace, list)
+	} else {
+		this.data.Store(item.Namespace, []*v1beta1.PipelineRun{item})
+	}
+}
+
+func (this *PipelineRunMapStruct) Update(item *v1beta1.PipelineRun) error {
+	if list, ok := this.data.Load(item.Namespace); ok {
+		for i, rangeItem := range list.([]*v1beta1.PipelineRun) {
+			if rangeItem.Name == item.Name {
+				list.([]*v1beta1.PipelineRun)[i] = item
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("PipelineRun-%s not found", item.Name)
+}
+
+func (this *PipelineRunMapStruct) Delete(svc *v1beta1.PipelineRun) {
+	if list, ok := this.data.Load(svc.Namespace); ok {
+		for i, rangeItem := range list.([]*v1beta1.PipelineRun) {
+			if rangeItem.Name == svc.Name {
+				newList := append(list.([]*v1beta1.PipelineRun)[:i], list.([]*v1beta1.PipelineRun)[i+1:]...)
+				this.data.Store(svc.Namespace, newList)
+				break
+			}
+		}
+	}
+}
+
+func (this *PipelineRunMapStruct) ListAll(ns string) []*v1beta1.PipelineRun {
+	if list, ok := this.data.Load(ns); ok {
+		newList := list.([]*v1beta1.PipelineRun)
+		sort.Sort(V1PipelineRun(newList)) //  按时间倒排序
+		return newList
+	}
+	return []*v1beta1.PipelineRun{} //返回空列表
+}
+
+func (this *PipelineRunMapStruct) Find(ns, name string) *v1beta1.PipelineRun {
+	if list, ok := this.data.Load(ns); ok {
+		for _, rangeItem := range list.([]*v1beta1.PipelineRun) {
+			if rangeItem.Name == name {
+				return rangeItem
+			}
+		}
+	}
+
+	return &v1beta1.PipelineRun{}
+}

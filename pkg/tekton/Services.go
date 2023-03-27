@@ -8,9 +8,10 @@ import (
 )
 
 type TektonService struct {
-	TaskMap     *TaskMapStruct            `inject:"-"`
-	PipelineMap *PipelineMapStruct        `inject:"-"`
-	Client      *tektonVersiond.Clientset `inject:"-"`
+	TaskMap        *TaskMapStruct            `inject:"-"`
+	PipelineMap    *PipelineMapStruct        `inject:"-"`
+	PipelineRunMap *PipelineRunMapStruct     `inject:"-"`
+	Client         *tektonVersiond.Clientset `inject:"-"`
 }
 
 func NewTektonService() *TektonService {
@@ -59,4 +60,26 @@ func (this *TektonService) UpdatePipeline(pipeline *v1beta1.Pipeline) error {
 
 func (this *TektonService) DeletePipeline(ns, name string) error {
 	return this.Client.TektonV1beta1().Pipelines(ns).Delete(context.Background(), name, v1.DeleteOptions{})
+}
+
+func (this *TektonService) ListPipelineRunByNs(ns string) []*v1beta1.PipelineRun {
+	return this.PipelineRunMap.ListAll(ns)
+}
+
+func (this *TektonService) ShowPipelineRun(ns, name string) *v1beta1.PipelineRun {
+	return this.PipelineRunMap.Find(ns, name)
+}
+
+func (this *TektonService) CreatePipelineRun(pipelineRun *v1beta1.PipelineRun) error {
+	_, err := this.Client.TektonV1beta1().PipelineRuns(pipelineRun.Namespace).Create(context.Background(), pipelineRun, v1.CreateOptions{})
+	return err
+}
+
+func (this *TektonService) UpdatePipelineRun(pipelineRun *v1beta1.PipelineRun) error {
+	_, err := this.Client.TektonV1beta1().PipelineRuns(pipelineRun.Namespace).Update(context.Background(), pipelineRun, v1.UpdateOptions{})
+	return err
+}
+
+func (this *TektonService) DeletePipelineRun(ns, name string) error {
+	return this.Client.TektonV1beta1().PipelineRuns(ns).Delete(context.Background(), name, v1.DeleteOptions{})
 }

@@ -80,3 +80,7 @@ func (*K8sInformerHandlerCfg) InitTektonTaskHandler() *tekton.TaskHandler {
 func (*K8sInformerHandlerCfg) InitTektonPipelineHandler() *tekton.PipelineHandler {
 	return &tekton.PipelineHandler{}
 }
+
+func (*K8sInformerHandlerCfg) InitTektonPipelineRunHandler() *tekton.PipelineRunHandler {
+	return &tekton.PipelineRunHandler{}
+}

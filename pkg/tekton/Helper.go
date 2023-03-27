@@ -26,3 +26,12 @@ func ConvertToPipeline(obj interface{}) *v1beta1.Pipeline {
 	}
 	return pipeline
 }
+
+// ConvertToPipelineRun 把对象转化为 pipelineRun
+func ConvertToPipelineRun(obj interface{}) *v1beta1.PipelineRun {
+	pipeline := &v1beta1.PipelineRun{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, pipeline); err != nil {
+		return nil
+	}
+	return pipeline
+}

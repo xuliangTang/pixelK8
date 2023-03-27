@@ -103,3 +103,52 @@ func (this *PipelineHandler) OnDelete(obj interface{}) {
 		},
 	)
 }
+
+// PipelineRun
+
+type PipelineRunHandler struct {
+	PipelineRunMap *PipelineRunMapStruct `inject:"-"`
+}
+
+func (this *PipelineRunHandler) OnAdd(obj interface{}) {
+	getObj := ConvertToPipelineRun(obj)
+	this.PipelineRunMap.Add(getObj)
+	ns := getObj.Namespace
+	ws.ClientMap.SendAll(
+		gin.H{
+			"type": "pipelinerun",
+			"result": gin.H{"ns": ns,
+				"data": this.PipelineRunMap.ListAll(ns)},
+		},
+	)
+}
+
+func (this *PipelineRunHandler) OnUpdate(oldObj, newObj interface{}) {
+	getObj := ConvertToPipelineRun(newObj)
+	err := this.PipelineRunMap.Update(getObj)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	ns := getObj.Namespace
+	ws.ClientMap.SendAll(
+		gin.H{
+			"type": "pipelinerun",
+			"result": gin.H{"ns": ns,
+				"data": this.PipelineRunMap.ListAll(ns)},
+		},
+	)
+}
+
+func (this *PipelineRunHandler) OnDelete(obj interface{}) {
+	getObj := ConvertToPipelineRun(obj)
+	this.PipelineRunMap.Delete(getObj)
+	ns := getObj.Namespace
+	ws.ClientMap.SendAll(
+		gin.H{
+			"type": "pipelinerun",
+			"result": gin.H{"ns": ns,
+				"data": this.PipelineRunMap.ListAll(ns)},
+		},
+	)
+}
