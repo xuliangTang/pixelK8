@@ -59,6 +59,31 @@ func (this *TektonCtl) pipelineList(ctx *gin.Context) any {
 	return this.TektonService.ListPipelineByNs(ns)
 }
 
+func (this *TektonCtl) showPipeline(ctx *gin.Context) any {
+	uri := &RsUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	return this.TektonService.ShowPipeline(uri.Namespace, uri.Name)
+}
+
+func (this *TektonCtl) createPipeline(ctx *gin.Context) (v athena.Void) {
+	pipeline := &v1beta1.Pipeline{}
+	athena.Error(ctx.BindJSON(pipeline))
+	athena.Error(this.TektonService.CreatePipeline(pipeline))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusNoContent)
+	return
+}
+
+func (this *TektonCtl) updatePipeline(ctx *gin.Context) (v athena.Void) {
+	pipeline := &v1beta1.Pipeline{}
+	athena.Error(ctx.BindJSON(pipeline))
+	athena.Error(this.TektonService.UpdatePipeline(pipeline))
+
+	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
+	return
+}
+
 func (this *TektonCtl) deletePipeline(ctx *gin.Context) (v athena.Void) {
 	uri := &RsUri{}
 	athena.Error(ctx.BindUri(uri))
@@ -82,6 +107,12 @@ func (this *TektonCtl) Build(athena *athena.Athena) {
 
 	// pipeline列表
 	athena.Handle(http.MethodGet, "/tekton/pipelines", this.pipelineList)
+	// pipeline详情
+	athena.Handle(http.MethodGet, "/tekton/pipeline/:ns/:name", this.showPipeline)
+	// 创建pipeline
+	athena.Handle(http.MethodPost, "/tekton/pipeline", this.createPipeline)
+	// 更新pipeline
+	athena.Handle(http.MethodPut, "/tekton/pipeline", this.updatePipeline)
 	// 删除pipeline
 	athena.Handle(http.MethodDelete, "/tekton/pipeline/:ns/:name", this.deletePipeline)
 }

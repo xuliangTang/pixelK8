@@ -140,3 +140,15 @@ func (this *PipelineMapStruct) ListAll(ns string) []*v1beta1.Pipeline {
 	}
 	return []*v1beta1.Pipeline{} //返回空列表
 }
+
+func (this *PipelineMapStruct) Find(ns, name string) *v1beta1.Pipeline {
+	if list, ok := this.data.Load(ns); ok {
+		for _, rangeItem := range list.([]*v1beta1.Pipeline) {
+			if rangeItem.Name == name {
+				return rangeItem
+			}
+		}
+	}
+
+	return &v1beta1.Pipeline{}
+}

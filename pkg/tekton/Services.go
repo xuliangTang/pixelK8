@@ -43,6 +43,20 @@ func (this *TektonService) ListPipelineByNs(ns string) []*v1beta1.Pipeline {
 	return this.PipelineMap.ListAll(ns)
 }
 
+func (this *TektonService) ShowPipeline(ns, name string) *v1beta1.Pipeline {
+	return this.PipelineMap.Find(ns, name)
+}
+
+func (this *TektonService) CreatePipeline(pipeline *v1beta1.Pipeline) error {
+	_, err := this.Client.TektonV1beta1().Pipelines(pipeline.Namespace).Create(context.Background(), pipeline, v1.CreateOptions{})
+	return err
+}
+
+func (this *TektonService) UpdatePipeline(pipeline *v1beta1.Pipeline) error {
+	_, err := this.Client.TektonV1beta1().Pipelines(pipeline.Namespace).Update(context.Background(), pipeline, v1.UpdateOptions{})
+	return err
+}
+
 func (this *TektonService) DeletePipeline(ns, name string) error {
 	return this.Client.TektonV1beta1().Pipelines(ns).Delete(context.Background(), name, v1.DeleteOptions{})
 }
