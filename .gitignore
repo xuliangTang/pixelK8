@@ -11,3 +11,5 @@ run.bat
 kubeconfig
 k8s-ca.crt
 k8s-ca.key
+
+yamls

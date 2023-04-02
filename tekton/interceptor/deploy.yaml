@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekton-myinterceptor
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tekton-myinterceptor
+  template:
+    metadata:
+      labels:
+        app: tekton-myinterceptor
+    spec:
+      nodeName: lain1
+      containers:
+        - name: myinterceptor
+          image: alpine:3.12
+          imagePullPolicy: IfNotPresent
+          command: ["/app/myinterceptor"]
+          volumeMounts:
+            - name: app
+              mountPath: /app
+          ports:
+            - containerPort: 80
+      volumes:
+        - name: app
+          hostPath:
+            path: /home/txl/tekton/interceptor
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tekton-myinterceptor
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: tekton-myinterceptor
