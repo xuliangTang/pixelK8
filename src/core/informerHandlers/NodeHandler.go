@@ -17,6 +17,9 @@ type NodeHandler struct {
 
 func (this *NodeHandler) OnAdd(obj interface{}) {
 	node := obj.(*coreV1.Node)
+	if node.Status.Phase != coreV1.NodeRunning {
+		return
+	}
 	this.NodeMap.Add(node)
 
 	// 通知ws客户端
