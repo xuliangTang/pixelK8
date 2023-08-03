@@ -1,5 +1,10 @@
 package requests
 
+type NamespaceNameUri struct {
+	Namespace string `uri:"ns" binding:"required"`
+	Name      string `uri:"name" binding:"required"`
+}
+
 type DeploymentUri struct {
 	Namespace  string `uri:"ns" binding:"required"`
 	Deployment string `uri:"deployment" binding:"required"`

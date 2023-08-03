@@ -11,6 +11,7 @@ import (
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
 	"pixelk8/src/requests"
+	"sigs.k8s.io/yaml"
 	"strconv"
 )
 
@@ -127,6 +128,17 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 func (this *IngressService) Delete(uri *requests.DeleteIngressUri) error {
 	return this.K8sClient.NetworkingV1().Ingresses(uri.Namespace).
 		Delete(context.Background(), uri.Name, metaV1.DeleteOptions{})
+}
+
+// GetForYaml 查询ingress转为yaml
+func (this *IngressService) GetForYaml(uri *requests.NamespaceNameUri) ([]byte, error) {
+	ing, err := this.K8sClient.NetworkingV1().Ingresses(uri.Namespace).Get(context.Background(), uri.Name, metaV1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := yaml.Marshal(ing)
+	return b, err
 }
 
 // 拼接ingress host

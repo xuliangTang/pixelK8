@@ -44,6 +44,16 @@ func (this *IngressCtl) deleteIngress(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *IngressCtl) ingressForYaml(ctx *gin.Context) any {
+	uri := &requests.NamespaceNameUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	ingressByte, err := this.IngSvc.GetForYaml(uri)
+	athena.Error(err)
+
+	return string(ingressByte)
+}
+
 func (this *IngressCtl) Build(athena *athena.Athena) {
 	// ingress列表
 	athena.Handle("GET", "/ingress", this.ingress)
@@ -51,4 +61,6 @@ func (this *IngressCtl) Build(athena *athena.Athena) {
 	athena.Handle("POST", "/ingress", this.createIngress)
 	// 删除ingress
 	athena.Handle("DELETE", "/ingress/:ns/:ingress", this.deleteIngress)
+	// 获取ingress的yaml内容
+	athena.Handle(http.MethodGet, "/ingress/:ns/:name", this.ingressForYaml)
 }
