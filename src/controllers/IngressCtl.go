@@ -54,6 +54,14 @@ func (this *IngressCtl) ingressForYaml(ctx *gin.Context) any {
 	return string(ingressByte)
 }
 
+func (this *IngressCtl) createAuthSecret(ctx *gin.Context) (v athena.Void) {
+	req := &requests.CreateIngressAuthSecret{}
+	athena.Error(ctx.ShouldBindJSON(req))
+	athena.Error(this.IngSvc.CreateAuthSecret(req))
+
+	return
+}
+
 func (this *IngressCtl) Build(athena *athena.Athena) {
 	// ingress列表
 	athena.Handle("GET", "/ingress", this.ingress)
@@ -63,4 +71,6 @@ func (this *IngressCtl) Build(athena *athena.Athena) {
 	athena.Handle("DELETE", "/ingress/:ns/:ingress", this.deleteIngress)
 	// 获取ingress的yaml内容
 	athena.Handle(http.MethodGet, "/ingress/:ns/:name", this.ingressForYaml)
+	// 创建ingress的basicAuth secret
+	athena.Handle(http.MethodPost, "/ingress/auth/secret", this.createAuthSecret)
 }

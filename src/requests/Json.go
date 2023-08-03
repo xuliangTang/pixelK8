@@ -45,3 +45,12 @@ type UpdateNode struct {
 	Labels map[string]string `json:"labels" binding:"required"`
 	Taints []coreV1.Taint    `json:"taints" binding:"required"`
 }
+
+// CreateIngressAuthSecret 创建ingress basicAuth的secret
+type CreateIngressAuthSecret struct {
+	Namespace  string `json:"ns" binding:"required"`
+	AuthType   string `json:"auth_type" binding:"required"`
+	SecretName string `json:"secret_name" binding:"required"`
+	UserName   string `json:"user_name" binding:"required"`
+	UserPass   string `json:"user_pass" binding:"required"`
+}

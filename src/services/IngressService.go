@@ -2,14 +2,17 @@ package services
 
 import (
 	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/xuliangTang/athena/athena"
+	v1 "k8s.io/api/core/v1"
 	networkingV1 "k8s.io/api/networking/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"pixelk8/src/constants"
 	"pixelk8/src/core/maps"
 	"pixelk8/src/dto"
+	"pixelk8/src/helpers"
 	"pixelk8/src/requests"
 	"sigs.k8s.io/yaml"
 	"strconv"
@@ -40,6 +43,7 @@ func (this *IngressService) ListByNs(ns string) (ret []*dto.IngressList) {
 			Opt: &dto.IngressOpt{
 				CorsEnable:    this.checkOpt(ing, constants.CorsEnable),
 				RewriteEnable: this.checkOpt(ing, constants.RewriteEnable),
+				AuthEnable:    this.checkOpt(ing, constants.AuthEnable),
 			},
 		}
 	}
@@ -139,6 +143,28 @@ func (this *IngressService) GetForYaml(uri *requests.NamespaceNameUri) ([]byte, 
 
 	b, err := yaml.Marshal(ing)
 	return b, err
+}
+
+// CreateAuthSecret 创建ingress的basicAuth secret
+func (this *IngressService) CreateAuthSecret(req *requests.CreateIngressAuthSecret) error {
+	secret := &v1.Secret{}
+	secret.Name = req.SecretName
+	secret.Namespace = req.Namespace
+
+	if req.AuthType == "auth-file" {
+		secret.Data = map[string][]byte{
+			"auth": []byte(req.UserName + ":" + helpers.HashApr1(req.UserPass)),
+		}
+	} else if req.AuthType == "auth-map" {
+		secret.Data = map[string][]byte{
+			req.UserName: []byte(helpers.HashApr1(req.UserPass)),
+		}
+	} else {
+		return errors.New("auth-type只能是auth-file或auth-map")
+	}
+
+	_, err := this.K8sClient.CoreV1().Secrets(req.Namespace).Create(context.Background(), secret, metaV1.CreateOptions{})
+	return err
 }
 
 // 拼接ingress host
