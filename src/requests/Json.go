@@ -4,10 +4,11 @@ import coreV1 "k8s.io/api/core/v1"
 
 // CreateIngress 创建ingress对象
 type CreateIngress struct {
-	Name        string          `json:"name" binding:"required"`
-	Namespace   string          `json:"namespace" binding:"required"`
-	Rules       []*IngressRules `json:"rules" binding:"required"`
-	Annotations string          `json:"annotations"`
+	Name             string            `json:"name" binding:"required"`
+	Namespace        string            `json:"namespace" binding:"required"`
+	Rules            []*IngressRules   `json:"rules" binding:"required"`
+	Annotations      string            `json:"annotations"`       // 单行注解，用;分隔
+	MultiAnnotations map[string]string `json:"multi_annotations"` // 多行注解
 }
 
 // IngressRules ingress规则

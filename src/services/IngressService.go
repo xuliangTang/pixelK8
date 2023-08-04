@@ -44,6 +44,7 @@ func (this *IngressService) ListByNs(ns string) (ret []*dto.IngressList) {
 				CorsEnable:    this.checkOpt(ing, constants.CorsEnable),
 				RewriteEnable: this.checkOpt(ing, constants.RewriteEnable),
 				AuthEnable:    this.checkOpt(ing, constants.AuthEnable),
+				LimitEnable:   this.checkOpt(ing, constants.LimitEnable),
 			},
 		}
 	}
@@ -106,6 +107,12 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 		ingressRules = append(ingressRules, rule)
 	}
 
+	// 组装单行注解和多行注解
+	annotations := this.CommonSvc.ParseAnnotations(req.Annotations)
+	for k, v := range req.MultiAnnotations {
+		annotations[k] = v
+	}
+
 	ingress := &networkingV1.Ingress{
 		TypeMeta: metaV1.TypeMeta{
 			Kind:       "Ingress",
@@ -114,7 +121,7 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 		ObjectMeta: metaV1.ObjectMeta{
 			Name:        req.Name,
 			Namespace:   req.Namespace,
-			Annotations: this.CommonSvc.ParseAnnotations(req.Annotations),
+			Annotations: annotations,
 		},
 		Spec: networkingV1.IngressSpec{
 			IngressClassName: &className,

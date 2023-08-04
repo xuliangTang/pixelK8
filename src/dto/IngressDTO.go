@@ -12,4 +12,5 @@ type IngressOpt struct {
 	CorsEnable    bool `json:"cors_enable"`
 	RewriteEnable bool `json:"rewrite_enable"`
 	AuthEnable    bool `json:"auth_enable"`
+	LimitEnable   bool `json:"limit_enable"`
 }
