@@ -26,10 +26,10 @@ func (this *IngressCtl) ingress(ctx *gin.Context) athena.Collection {
 	return this.IngSvc.Paging(page, ingList)
 }
 
-func (this *IngressCtl) createIngress(ctx *gin.Context) any {
-	req := &requests.CreateIngress{}
+func (this *IngressCtl) postIngress(ctx *gin.Context) any {
+	req := &requests.PostIngress{}
 	athena.Error(ctx.BindJSON(req))
-	athena.Error(this.IngSvc.Create(req))
+	athena.Error(this.IngSvc.Post(req))
 
 	ctx.Set(athena.CtxHttpStatusCode, http.StatusCreated)
 	return req
@@ -62,15 +62,24 @@ func (this *IngressCtl) createAuthSecret(ctx *gin.Context) (v athena.Void) {
 	return
 }
 
+func (this *IngressCtl) showIngress(ctx *gin.Context) any {
+	uri := &requests.NamespaceNameUri{}
+	athena.Error(ctx.BindUri(uri))
+
+	return this.IngSvc.ShowIngress(uri)
+}
+
 func (this *IngressCtl) Build(athena *athena.Athena) {
 	// ingress列表
 	athena.Handle("GET", "/ingress", this.ingress)
-	// 创建ingress
-	athena.Handle("POST", "/ingress", this.createIngress)
+	// 创建或更新ingress
+	athena.Handle("POST", "/ingress", this.postIngress)
 	// 删除ingress
 	athena.Handle("DELETE", "/ingress/:ns/:ingress", this.deleteIngress)
 	// 获取ingress的yaml内容
-	athena.Handle(http.MethodGet, "/ingress/:ns/:name", this.ingressForYaml)
+	athena.Handle(http.MethodGet, "/ingress/yaml/:ns/:name", this.ingressForYaml)
 	// 创建ingress的basicAuth secret
 	athena.Handle(http.MethodPost, "/ingress/auth/secret", this.createAuthSecret)
+	// 查看ingress
+	athena.Handle(http.MethodGet, "/ingress/:ns/:name", this.showIngress)
 }

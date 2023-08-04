@@ -68,8 +68,8 @@ func (this *IngressService) Paging(page *athena.Page, ingList []*dto.IngressList
 	return *collection
 }
 
-// Create 创建ingress
-func (this *IngressService) Create(req *requests.CreateIngress) error {
+// Post 提交ingress
+func (this *IngressService) Post(req *requests.PostIngress) error {
 	className := "nginx"
 	var ingressRules []networkingV1.IngressRule
 	prefix := networkingV1.PathTypePrefix
@@ -107,12 +107,6 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 		ingressRules = append(ingressRules, rule)
 	}
 
-	// 组装单行注解和多行注解
-	annotations := this.CommonSvc.ParseAnnotations(req.Annotations)
-	for k, v := range req.MultiAnnotations {
-		annotations[k] = v
-	}
-
 	ingress := &networkingV1.Ingress{
 		TypeMeta: metaV1.TypeMeta{
 			Kind:       "Ingress",
@@ -121,7 +115,7 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 		ObjectMeta: metaV1.ObjectMeta{
 			Name:        req.Name,
 			Namespace:   req.Namespace,
-			Annotations: annotations,
+			Annotations: req.Annotations,
 		},
 		Spec: networkingV1.IngressSpec{
 			IngressClassName: &className,
@@ -129,9 +123,14 @@ func (this *IngressService) Create(req *requests.CreateIngress) error {
 		},
 	}
 
-	_, err := this.K8sClient.NetworkingV1().Ingresses(req.Namespace).
-		Create(context.Background(), ingress, metaV1.CreateOptions{})
-
+	var err error
+	if req.IsUpdate {
+		_, err = this.K8sClient.NetworkingV1().Ingresses(req.Namespace).
+			Update(context.Background(), ingress, metaV1.UpdateOptions{})
+	} else {
+		_, err = this.K8sClient.NetworkingV1().Ingresses(req.Namespace).
+			Create(context.Background(), ingress, metaV1.CreateOptions{})
+	}
 	return err
 }
 
@@ -172,6 +171,12 @@ func (this *IngressService) CreateAuthSecret(req *requests.CreateIngressAuthSecr
 
 	_, err := this.K8sClient.CoreV1().Secrets(req.Namespace).Create(context.Background(), secret, metaV1.CreateOptions{})
 	return err
+}
+
+// ShowIngress 查看ingress详情
+func (this *IngressService) ShowIngress(uri *requests.NamespaceNameUri) *networkingV1.Ingress {
+	getIng, _ := this.IngressMap.Find(uri.Namespace, uri.Name)
+	return getIng
 }
 
 // 拼接ingress host

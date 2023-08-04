@@ -60,3 +60,16 @@ func (this *IngressMap) ListByNs(ns string) []*networkingV1.Ingress {
 	}
 	return []*networkingV1.Ingress{}
 }
+
+// Find 根据名称查找
+func (this *IngressMap) Find(ns string, ingName string) (*networkingV1.Ingress, error) {
+	if ingList, ok := this.data.Load(ns); ok {
+		for _, ing := range ingList.([]*networkingV1.Ingress) {
+			if ing.Name == ingName {
+				return ing, nil
+			}
+		}
+	}
+
+	return &networkingV1.Ingress{}, nil
+}
