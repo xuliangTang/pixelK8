@@ -5,4 +5,5 @@ const (
 	RewriteEnable = "nginx.ingress.kubernetes.io/rewrite-enable"
 	AuthEnable    = "nginx.ingress.kubernetes.io/auth-enable"
 	LimitEnable   = "nginx.ingress.kubernetes.io/limit-enable"
+	CanaryEnable  = "nginx.ingress.kubernetes.io/canary"
 )

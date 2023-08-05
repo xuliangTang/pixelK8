@@ -13,4 +13,5 @@ type IngressOpt struct {
 	RewriteEnable bool `json:"rewrite_enable"`
 	AuthEnable    bool `json:"auth_enable"`
 	LimitEnable   bool `json:"limit_enable"`
+	CanaryEnable  bool `json:"canary_enable"`
 }
