@@ -1,14 +1,18 @@
 package requests
 
-import coreV1 "k8s.io/api/core/v1"
+import (
+	coreV1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
+)
 
 // PostIngress 提交ingress对象
 type PostIngress struct {
-	Name        string            `json:"name" binding:"required"`
-	Namespace   string            `json:"namespace" binding:"required"`
-	Rules       []*IngressRules   `json:"rules" binding:"required"`
-	Annotations map[string]string `json:"annotations"`
-	IsUpdate    bool              `json:"is_update"`
+	Name        string                    `json:"name" binding:"required"`
+	Namespace   string                    `json:"namespace" binding:"required"`
+	Rules       []*IngressRules           `json:"rules" binding:"required"`
+	Annotations map[string]string         `json:"annotations"`
+	TLS         []networkingv1.IngressTLS `json:"tls"`
+	IsUpdate    bool                      `json:"is_update"`
 }
 
 // IngressRules ingress规则

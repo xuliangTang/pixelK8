@@ -121,6 +121,7 @@ func (this *IngressService) Post(req *requests.PostIngress) error {
 		Spec: networkingV1.IngressSpec{
 			IngressClassName: &className,
 			Rules:            ingressRules,
+			TLS:              req.TLS,
 		},
 	}
 
