@@ -9,10 +9,11 @@ type IngressList struct {
 }
 
 type IngressOpt struct {
-	CorsEnable    bool `json:"cors_enable"`
-	RewriteEnable bool `json:"rewrite_enable"`
-	AuthEnable    bool `json:"auth_enable"`
-	LimitEnable   bool `json:"limit_enable"`
-	CanaryEnable  bool `json:"canary_enable"`
-	MirrorEnable  bool `json:"mirror_enable"`
+	CorsEnable           bool `json:"cors_enable"`
+	RewriteEnable        bool `json:"rewrite_enable"`
+	AuthEnable           bool `json:"auth_enable"`
+	LimitEnable          bool `json:"limit_enable"`
+	CanaryEnable         bool `json:"canary_enable"`
+	MirrorEnable         bool `json:"mirror_enable"`
+	DefaultBackendEnable bool `json:"default_backend_enable"`
 }

@@ -41,12 +41,13 @@ func (this *IngressService) ListByNs(ns string) (ret []*dto.IngressList) {
 			Hosts:     this.joinRuleHosts(ing.Spec.Rules),
 			CreatedAt: ing.CreationTimestamp.Format(athena.DateTimeFormat),
 			Opt: &dto.IngressOpt{
-				CorsEnable:    this.checkOpt(ing, constants.CorsEnable),
-				RewriteEnable: this.checkOpt(ing, constants.RewriteEnable),
-				AuthEnable:    this.checkOpt(ing, constants.AuthEnable),
-				LimitEnable:   this.checkOpt(ing, constants.LimitEnable),
-				CanaryEnable:  this.checkOpt(ing, constants.CanaryEnable),
-				MirrorEnable:  this.checkOpt(ing, constants.MirrorEnable),
+				CorsEnable:           this.checkOpt(ing, constants.CorsEnable),
+				RewriteEnable:        this.checkOpt(ing, constants.RewriteEnable),
+				AuthEnable:           this.checkOpt(ing, constants.AuthEnable),
+				LimitEnable:          this.checkOpt(ing, constants.LimitEnable),
+				CanaryEnable:         this.checkOpt(ing, constants.CanaryEnable),
+				MirrorEnable:         this.checkOpt(ing, constants.MirrorEnable),
+				DefaultBackendEnable: this.checkOpt(ing, constants.DefaultBackendEnable),
 			},
 		}
 	}
