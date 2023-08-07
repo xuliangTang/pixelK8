@@ -14,4 +14,5 @@ type IngressOpt struct {
 	AuthEnable    bool `json:"auth_enable"`
 	LimitEnable   bool `json:"limit_enable"`
 	CanaryEnable  bool `json:"canary_enable"`
+	MirrorEnable  bool `json:"mirror_enable"`
 }

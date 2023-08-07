@@ -46,6 +46,7 @@ func (this *IngressService) ListByNs(ns string) (ret []*dto.IngressList) {
 				AuthEnable:    this.checkOpt(ing, constants.AuthEnable),
 				LimitEnable:   this.checkOpt(ing, constants.LimitEnable),
 				CanaryEnable:  this.checkOpt(ing, constants.CanaryEnable),
+				MirrorEnable:  this.checkOpt(ing, constants.MirrorEnable),
 			},
 		}
 	}
